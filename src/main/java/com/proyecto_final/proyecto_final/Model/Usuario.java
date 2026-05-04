@@ -21,10 +21,16 @@ public class Usuario {
     private String apellido;
 
     @Column(nullable = false, unique = true)
+    private String dni;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private boolean activo;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
