@@ -1,6 +1,6 @@
 package com.proyecto_final.proyecto_final.Enums;
 
-public enum EstadoTurno {
+public enum EstadoTarea {
     PENDIENTE,
     EN_CURSO,
     COMPLETADO,
