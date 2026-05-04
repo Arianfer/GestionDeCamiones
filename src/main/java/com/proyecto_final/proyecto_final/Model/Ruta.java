@@ -23,5 +23,5 @@ public class Ruta {
     private String descripcion;
 
     @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL)
-    private List<Zona> zonas;
+    private List<Servicio> servicios;
 }

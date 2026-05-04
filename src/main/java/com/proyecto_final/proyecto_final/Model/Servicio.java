@@ -7,12 +7,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "zona")
+@Table(name = "servicio")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Zona {
+public class Servicio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
