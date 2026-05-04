@@ -4,6 +4,5 @@ public enum EstadoTarea {
     PENDIENTE,
     EN_CURSO,
     COMPLETADO,
-    CANCELADO,
-    INCOVENIENTE;
+    CANCELADO
 }
