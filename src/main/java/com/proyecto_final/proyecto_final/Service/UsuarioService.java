@@ -13,7 +13,6 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
 
-    // Crear usuario
     public Usuario crearUsuario(Usuario usuario) {
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             throw new RuntimeException("Ya existe un usuario con ese email");
@@ -24,24 +23,20 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    // Listar todos
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
     }
 
-    // Buscar por ID
     public Usuario buscarPorId(int id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
     }
 
-    // Buscar por email
     public Usuario buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
     }
 
-    // Actualizar usuario
     public Usuario actualizarUsuario(int id, Usuario datosNuevos) {
         Usuario usuarioExistente = buscarPorId(id);
 
