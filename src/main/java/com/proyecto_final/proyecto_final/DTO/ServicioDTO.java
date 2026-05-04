@@ -1,15 +1,15 @@
 package com.proyecto_final.proyecto_final.DTO;
 
 import lombok.*;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RutaDTO {
+public class ServicioDTO {
     private Long id;
     private String nombre;
-    private String descripcion;
-    private List<ServicioDTO> servicios;
+    private int prioridad;
+    private int orden;
+    private Long idRuta;
 }
