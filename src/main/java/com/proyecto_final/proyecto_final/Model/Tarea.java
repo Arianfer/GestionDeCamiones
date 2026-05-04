@@ -2,13 +2,16 @@ package com.proyecto_final.proyecto_final.Model;
 
 import com.proyecto_final.proyecto_final.Enums.EstadoTarea;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tarea")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Tarea {
 
     @Id
@@ -16,6 +19,7 @@ public class Tarea {
     private Long id;
 
     private String descripcion;
+    private LocalDateTime fechaEjecucion;
 
     @Enumerated(EnumType.STRING)
     private EstadoTarea estado; // PENDIENTE, COMPLETADA, CANCELADA, INCOVENIENTE
@@ -29,6 +33,9 @@ public class Tarea {
     @JoinColumn(name = "id_ruta")
     private Ruta ruta;
 
-    // Si querés saber cuándo se hizo
-    private LocalDateTime fechaEjecucion;
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
+
+
 }
