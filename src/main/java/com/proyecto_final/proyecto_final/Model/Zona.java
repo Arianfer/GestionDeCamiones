@@ -1,4 +1,43 @@
 package com.proyecto_final.proyecto_final.Model;
 
+import com.proyecto_final.proyecto_final.Enums.Frecuencia;
+import com.proyecto_final.proyecto_final.Enums.Prioridad;
+import com.proyecto_final.proyecto_final.Enums.TipoResiduo;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "zona")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Zona {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(nullable = false)
+    private String nombre;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Prioridad prioridad;
+
+    @Column(nullable = false)
+    private String direccion;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoResiduo tipoResiduo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Frecuencia frecuencia;
+
+    // Muchas zonas pertenecen a una ruta
+    @ManyToOne
+    @JoinColumn(name = "id_ruta", nullable = false)
+    private Ruta ruta;
 }
