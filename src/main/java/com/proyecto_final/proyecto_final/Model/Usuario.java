@@ -4,7 +4,7 @@ import com.proyecto_final.proyecto_final.Enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuario")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
