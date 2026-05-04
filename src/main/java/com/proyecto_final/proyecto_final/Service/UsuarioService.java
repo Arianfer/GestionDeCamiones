@@ -28,7 +28,7 @@ public class UsuarioService {
     }
 
     public Usuario buscarPorId(int id) {
-        return usuarioRepository.findById(id)
+        return usuarioRepository.findById((long) id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
     }
 
