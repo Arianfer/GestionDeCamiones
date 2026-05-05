@@ -58,9 +58,37 @@ public class CamionService {
 
         return camionRepository.save(camionExistente);
     }
+
     //Eliminar camion
     public void eliminarCamion(Long id) {
         buscarPorId(id); // verifica que existe antes de eliminar
         camionRepository.deleteById(id);
+    }
+
+    /// Agregados que los necesitaba para el controller. Arian)
+    public Camion guardarCamion(Camion camion) {
+        return camionRepository.save(camion);
+    }
+
+    public Double calcularCostoViaje(Long id, Double km) {
+        // 1. Buscamos el camión por ID usando el Repository
+        // Si no existe, lanzamos una excepción (podes personalizar el mensaje)
+        Camion camion = camionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Camión no encontrado con el ID: " + id));
+
+        // 2. Definimos el precio del Diesel (Podrías tener esto en un archivo de configuración)
+        // Precio promedio actual en estaciones de servicio locales
+        Double precioDiesel = 1100.0;
+
+        // 3. Obtenemos el consumo específico del modelo (ej: 0.35 litros por km)
+        Double consumoPorKm = camion.getConsumoDieselPorKm();
+
+        // 4. Lógica de negocio: (Km * Consumo) * Precio
+        if (consumoPorKm == null || consumoPorKm <= 0) {
+            return 0.0; // Evitamos cálculos erróneos si el dato no está cargado
+        }
+
+
+        return (km * consumoPorKm) * precioDiesel;
     }
 }
