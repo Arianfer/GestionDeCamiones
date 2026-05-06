@@ -20,8 +20,8 @@ public class RutaController {
         return rutaService.listarRutas();
     }
 
-    @GetMapping
-    public Ruta crearRuta(@RequestParam Ruta ruta){
+    @PostMapping
+    public Ruta crearRuta(@RequestBody Ruta ruta){
         return rutaService.crearRuta(ruta);
     }
 

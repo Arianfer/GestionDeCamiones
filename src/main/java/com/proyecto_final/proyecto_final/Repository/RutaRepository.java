@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface RutaRepository extends JpaRepository<Ruta, Long> {
 
     Optional<Ruta> findByNombre(String nombre);
-    List<Ruta> findByCamionId(Long camionId); // Para encontrar rutas asignadas a un camion especifico
+    //List<Ruta> findByCamionId(Long camionId); // Para encontrar rutas asignadas a un camion especifico
 }
