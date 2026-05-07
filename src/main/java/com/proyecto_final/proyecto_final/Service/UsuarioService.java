@@ -37,6 +37,20 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
     }
 
+    public Usuario autenticar(String email, String password) {
+        Usuario usuario = buscarPorEmail(email);
+
+        if (!usuario.isActivo()) {
+            throw new RuntimeException("El usuario se encuentra inactivo");
+        }
+
+        if (!usuario.getPassword().equals(password)) {
+            throw new RuntimeException("Credenciales invalidas");
+        }
+
+        return usuario;
+    }
+
     public Usuario actualizarUsuario(int id, Usuario datosNuevos) {
         Usuario usuarioExistente = buscarPorId(id);
 

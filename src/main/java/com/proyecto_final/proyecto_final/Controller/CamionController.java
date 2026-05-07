@@ -23,7 +23,7 @@ public class CamionController {
 
     @PostMapping
     public Camion guardar(@RequestBody Camion camion) {
-        return camionService.guardarCamion(camion);
+        return camionService.crearCamion(camion);
     }
 
     // Endpoint para ver el detalle de un camión específico de la flota de Ciageser

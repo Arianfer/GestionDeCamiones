@@ -1,5 +1,6 @@
 package com.proyecto_final.proyecto_final.Controller;
 
+import com.proyecto_final.proyecto_final.DTO.UsuarioDTO;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -16,23 +17,23 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @GetMapping
-    public List<Usuario> listar() {
-        return usuarioService.listarUsuarios();
+    public List<UsuarioDTO> listar() {
+        return usuarioService.listarUsuarios().stream().map(this::toDto).toList();
     }
 
     @GetMapping("/{id}")
-    public Usuario obtenerPorId(@PathVariable int id) {
-        return usuarioService.buscarPorId(id);
+    public UsuarioDTO obtenerPorId(@PathVariable int id) {
+        return toDto(usuarioService.buscarPorId(id));
     }
 
     @PostMapping
-    public Usuario crearUsuario(@RequestBody Usuario usuario) {
-        return usuarioService.crearUsuario(usuario);
+    public UsuarioDTO crearUsuario(@RequestBody Usuario usuario) {
+        return toDto(usuarioService.crearUsuario(usuario));
     }
 
-    @PutMapping
-    public Usuario actualizarUsuario(@RequestBody int id, Usuario usuario) {
-        return usuarioService.actualizarUsuario(id, usuario);
+    @PutMapping("/{id}")
+    public UsuarioDTO actualizarUsuario(@PathVariable int id, @RequestBody Usuario usuario) {
+        return toDto(usuarioService.actualizarUsuario(id, usuario));
     }
 
     @PatchMapping("/{id}/desactivar")
@@ -40,5 +41,15 @@ public class UsuarioController {
         usuarioService.desactivarUsuario(id);
     }
 
-
+    private UsuarioDTO toDto(Usuario usuario) {
+        return UsuarioDTO.builder()
+                .id(usuario.getId())
+                .nombre(usuario.getNombre())
+                .apellido(usuario.getApellido())
+                .dni(usuario.getDni())
+                .email(usuario.getEmail())
+                .rol(usuario.getRol())
+                .activo(usuario.isActivo())
+                .build();
+    }
 }
