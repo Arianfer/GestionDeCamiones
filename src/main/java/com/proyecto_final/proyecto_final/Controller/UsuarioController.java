@@ -1,6 +1,6 @@
 package com.proyecto_final.proyecto_final.Controller;
 
-import com.proyecto_final.proyecto_final.DTO.UsuarioDTO;
+import com.proyecto_final.proyecto_final.DTO.Response.UsuarioResponseDTO;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -17,22 +17,22 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @GetMapping
-    public List<UsuarioDTO> listar() {
+    public List<UsuarioResponseDTO> listar() {
         return usuarioService.listarUsuarios().stream().map(this::toDto).toList();
     }
 
     @GetMapping("/{id}")
-    public UsuarioDTO obtenerPorId(@PathVariable int id) {
+    public UsuarioResponseDTO obtenerPorId(@PathVariable int id) {
         return toDto(usuarioService.buscarPorId(id));
     }
 
     @PostMapping
-    public UsuarioDTO crearUsuario(@RequestBody Usuario usuario) {
+    public UsuarioResponseDTO crearUsuario(@RequestBody Usuario usuario) {
         return toDto(usuarioService.crearUsuario(usuario));
     }
 
     @PutMapping("/{id}")
-    public UsuarioDTO actualizarUsuario(@PathVariable int id, @RequestBody Usuario usuario) {
+    public UsuarioResponseDTO actualizarUsuario(@PathVariable int id, @RequestBody Usuario usuario) {
         return toDto(usuarioService.actualizarUsuario(id, usuario));
     }
 
@@ -41,8 +41,8 @@ public class UsuarioController {
         usuarioService.desactivarUsuario(id);
     }
 
-    private UsuarioDTO toDto(Usuario usuario) {
-        return UsuarioDTO.builder()
+    private UsuarioResponseDTO toDto(Usuario usuario) {
+        return UsuarioResponseDTO.builder()
                 .id(usuario.getId())
                 .nombre(usuario.getNombre())
                 .apellido(usuario.getApellido())

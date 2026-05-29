@@ -1,14 +1,15 @@
-package com.proyecto_final.proyecto_final.DTO;
+package com.proyecto_final.proyecto_final.DTO.Request;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class UsuarioLoginDTO {
+@Builder
+public class UsuarioLoginRequestDTO {
     private String email;
     private String password;
 }
