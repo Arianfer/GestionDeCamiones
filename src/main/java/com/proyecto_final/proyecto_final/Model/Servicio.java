@@ -16,7 +16,7 @@ public class Servicio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(nullable = false)
     private String nombre;
@@ -27,6 +27,9 @@ public class Servicio {
 
     @Column(nullable = false)
     private String direccion;
+
+    private Double latitud;
+    private Double longitud;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

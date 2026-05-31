@@ -14,7 +14,7 @@ public class Ruta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idRuta;
+    private Long idRuta;
 
     @Column(nullable = false)
     private String nombre;
