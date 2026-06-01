@@ -30,6 +30,7 @@ public class Servicio {
 
     private Double latitud;
     private Double longitud;
+    private int orden;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

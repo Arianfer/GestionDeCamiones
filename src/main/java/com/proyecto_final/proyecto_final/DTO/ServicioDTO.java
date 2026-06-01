@@ -12,4 +12,6 @@ public class ServicioDTO {
     private int prioridad;
     private int orden;
     private Long idRuta;
+    private  Double latitudRuta;
+    private Double longitudRuta;
 }
