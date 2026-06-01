@@ -10,11 +10,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ServicioResponseDTO {
-    private Integer id;
+    private Long id;
     private String nombre;
-    private Prioridad prioridad;
-    private String direccion;
-    private TipoResiduo tipoResiduo;
-    private Frecuencia frecuencia;
-    private Integer idRuta;
+    private int prioridad;
+    private int orden;
+    private Long idRuta;
+    private Double latitudRuta;
+    private Double longitudRuta;
 }
