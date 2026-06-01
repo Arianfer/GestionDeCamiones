@@ -19,18 +19,14 @@ public class Servicio {
     private Long id;
 
     @Column(nullable = false)
-    private String nombre;
+    private String nombre; // Ej: "Manolo Alem", "Manolo Santa Fe"
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Prioridad prioridad;
 
     @Column(nullable = false)
-    private String direccion;
-
-    private Double latitud;
-    private Double longitud;
-    private int orden;
+    private String direccion; // Ej: "Alem 3800"
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -40,8 +36,17 @@ public class Servicio {
     @Column(nullable = false)
     private Frecuencia frecuencia;
 
-    // Muchas zonas pertenecen a una ruta
+    private Double latitud;
+    private Double longitud;
+    private int orden;
+
+    // Muchas sucursales pertenecen a una misma Ruta de recolección
     @ManyToOne
     @JoinColumn(name = "id_ruta", nullable = false)
     private Ruta ruta;
+
+    // Muchas sucursales pertenecen al mismo Cliente (Mismo CUIT)
+    @ManyToOne
+    @JoinColumn(name = "id_cliente", nullable = false)
+    private Cliente cliente;
 }
