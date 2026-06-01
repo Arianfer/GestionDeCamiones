@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UsuarioDTO {
-    private int id;
+    private Long id;
     private String nombre;
     private String apellido;
     private String dni;

@@ -2,7 +2,6 @@ package com.proyecto_final.proyecto_final.Controller;
 
 import com.proyecto_final.proyecto_final.Model.Camion;
 import com.proyecto_final.proyecto_final.Service.CamionService;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -16,18 +15,18 @@ public class CamionController {
     @Autowired
     private CamionService camionService;
 
-    @GetMapping
+    @GetMapping("/listar")
     public List<Camion> listar() {
         return camionService.listarCamiones();
     }
 
-    @PostMapping
+    @PostMapping("/guardar")
     public Camion guardar(@RequestBody Camion camion) {
         return camionService.crearCamion(camion);
     }
 
     // Endpoint para ver el detalle de un camión específico de la flota de Ciageser
-    @GetMapping("/{id}")
+    @GetMapping("/obtener/{id}")
     public Camion obtenerPorId(@PathVariable Long id) {
         return camionService.buscarPorId(id);
     }
@@ -38,7 +37,7 @@ public class CamionController {
     }
 
     // Endpoint para borrar un camión (Cuidado con este!)
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public void eliminar(@PathVariable Long id) {
         camionService.eliminarCamion(id);
     }
