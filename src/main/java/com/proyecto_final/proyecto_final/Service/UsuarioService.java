@@ -2,6 +2,7 @@ package com.proyecto_final.proyecto_final.Service;
 
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Repository.UsuarioRepository;
+import com.proyecto_final.proyecto_final.excepcion.UsuarioDesactivadoException;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,7 @@ public class UsuarioService {
         Usuario usuario = buscarPorEmail(email);
 
         if (!usuario.isActivo()) {
-            throw new RuntimeException("El usuario se encuentra inactivo");
+            throw new UsuarioDesactivadoException("El usuario se encuentra inactivo en el sistema de Ciageser");
         }
 
         if (!usuario.getPassword().equals(password)) {

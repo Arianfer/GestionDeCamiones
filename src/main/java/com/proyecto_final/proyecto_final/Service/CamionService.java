@@ -3,6 +3,7 @@ package com.proyecto_final.proyecto_final.Service;
 import com.proyecto_final.proyecto_final.Enums.EstadoCamion;
 import com.proyecto_final.proyecto_final.Model.Camion;
 import com.proyecto_final.proyecto_final.Repository.CamionRepository;
+import com.proyecto_final.proyecto_final.excepcion.PatenteInvalidaException;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class CamionService {
     // Crear camion
     public Camion crearCamion(Camion camion) {
         if (camionRepository.findByPatente(camion.getPatente()).isPresent()) {
-            throw new RuntimeException("Ya existe un camion con la patente: " + camion.getPatente());
+            throw new PatenteInvalidaException("Ya existe un camión registrado con la patente: " + camion.getPatente());
         }
         return camionRepository.save(camion);
     }
