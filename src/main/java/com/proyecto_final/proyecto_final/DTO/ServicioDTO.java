@@ -10,8 +10,10 @@ public class ServicioDTO {
     private Long id;
     private String nombre;
     private int prioridad;
+    private String direccion;
     private int orden;
+    private Double latitud;
+    private Double longitud;
     private Long idRuta;
-    private  Double latitudRuta;
-    private Double longitudRuta;
+    private Long idCliente;
 }
