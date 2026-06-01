@@ -12,9 +12,13 @@ import lombok.*;
 public class ServicioResponseDTO {
     private Long id;
     private String nombre;
-    private int prioridad;
+    private Prioridad prioridad;
+    private String direccion;
+    private TipoResiduo tipoResiduo;
+    private Frecuencia frecuencia;
+    private Double latitud;
+    private Double longitud;
     private int orden;
     private Long idRuta;
-    private Double latitudRuta;
-    private Double longitudRuta;
+    private Long idCliente;
 }

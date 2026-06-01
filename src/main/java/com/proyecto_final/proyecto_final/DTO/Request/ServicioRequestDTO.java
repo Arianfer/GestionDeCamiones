@@ -15,5 +15,9 @@ public class ServicioRequestDTO {
     private String direccion;
     private TipoResiduo tipoResiduo;
     private Frecuencia frecuencia;
-    private Integer idRuta;
+    private Double latitud;
+    private Double longitud;
+    private int orden;
+    private Long idRuta;
+    private Long idCliente;
 }

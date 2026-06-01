@@ -1,6 +1,6 @@
 package com.proyecto_final.proyecto_final.Controller;
 
-import com.proyecto_final.proyecto_final.DTO.ServicioDTO;
+import com.proyecto_final.proyecto_final.DTO.Response.ServicioResponseDTO;
 import com.proyecto_final.proyecto_final.Model.Servicio;
 import com.proyecto_final.proyecto_final.Service.ServicioService;
 import lombok.RequiredArgsConstructor;
@@ -16,24 +16,24 @@ public class ServicioController {
     private final ServicioService servicioService;
 
     @GetMapping
-    public List<ServicioDTO> listar() {
+    public List<ServicioResponseDTO> listar() {
         return servicioService.listarServicios().stream()
                 .map(this::toDto)
                 .toList();
     }
 
     @GetMapping("/{id}")
-    public ServicioDTO obtenerPorId(@PathVariable Long id) {
+    public ServicioResponseDTO obtenerPorId(@PathVariable Long id) {
         return toDto(servicioService.buscarPorId(id));
     }
 
     @PostMapping
-    public ServicioDTO guardar(@RequestBody Servicio servicio) {
+    public ServicioResponseDTO guardar(@RequestBody Servicio servicio) {
         return toDto(servicioService.crearServicio(servicio));
     }
 
     @PutMapping("/{id}")
-    public ServicioDTO actualizar(@PathVariable Long id, @RequestBody Servicio servicio) {
+    public ServicioResponseDTO actualizar(@PathVariable Long id, @RequestBody Servicio servicio) {
         return toDto(servicioService.actualizarServicio(id, servicio));
     }
 
@@ -42,12 +42,12 @@ public class ServicioController {
         servicioService.eliminarServicio(id);
     }
 
-    // Método helper para mapear Entidad -> DTO siguiendo tu estilo
-    private ServicioDTO toDto(Servicio servicio) {
-        return ServicioDTO.builder()
+    // Método helper para mapear Entidad -> DTO de Respuesta
+    private ServicioResponseDTO toDto(Servicio servicio) {
+        return ServicioResponseDTO.builder()
                 .id(servicio.getId())
                 .nombre(servicio.getNombre())
-                .prioridad(servicio.getPrioridad().ordinal()) // o .name() si usás String en el DTO
+                .prioridad(servicio.getPrioridad())
                 .direccion(servicio.getDireccion())
                 .latitud(servicio.getLatitud())
                 .longitud(servicio.getLongitud())
