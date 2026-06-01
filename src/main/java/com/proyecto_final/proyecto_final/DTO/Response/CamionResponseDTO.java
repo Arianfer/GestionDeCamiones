@@ -1,7 +1,6 @@
-package com.proyecto_final.proyecto_final.DTO;
+package com.proyecto_final.proyecto_final.DTO.Response;
 
 import com.proyecto_final.proyecto_final.Enums.EstadoCamion;
-import com.proyecto_final.proyecto_final.Enums.Rol;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CamionDTO {
-    private int id;
+public class CamionResponseDTO {
+    private Integer id;
     private String patente;
     private String tipo;
     private EstadoCamion estado;
-
+    private Double capacidadCarga;
+    private Double consumoDieselPorKm;
 }

@@ -1,6 +1,6 @@
 package com.proyecto_final.proyecto_final.Controller;
-import com.proyecto_final.proyecto_final.DTO.UsuarioDTO;
-import com.proyecto_final.proyecto_final.DTO.UsuarioLoginDTO;
+import com.proyecto_final.proyecto_final.DTO.Response.UsuarioResponseDTO;
+import com.proyecto_final.proyecto_final.DTO.Request.UsuarioLoginRequestDTO;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +16,19 @@ public class AuthController {
     private final UsuarioService usuarioService;
 
     @PostMapping("/login")
-    public UsuarioDTO login(@RequestBody UsuarioLoginDTO loginRequest) {
+    public UsuarioResponseDTO login(@RequestBody UsuarioLoginRequestDTO loginRequest) {
         Usuario usuario = usuarioService.autenticar(loginRequest.getEmail(),loginRequest.getPassword());
         return toDto(usuario);
     }
 
     @PostMapping("/register")
-    public UsuarioDTO register(@RequestBody Usuario usuario) {
+    public UsuarioResponseDTO register(@RequestBody Usuario usuario) {
         usuario.setActivo(true);
         return toDto(usuarioService.crearUsuario(usuario));
     }
 
-    private UsuarioDTO toDto(Usuario usuario) {
-        return UsuarioDTO.builder()
+    private UsuarioResponseDTO toDto(Usuario usuario) {
+        return UsuarioResponseDTO.builder()
                 .id(usuario.getId())
                 .nombre(usuario.getNombre())
                 .apellido(usuario.getApellido())

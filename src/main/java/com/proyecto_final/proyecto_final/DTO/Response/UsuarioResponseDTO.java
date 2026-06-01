@@ -1,4 +1,4 @@
-package com.proyecto_final.proyecto_final.DTO;
+package com.proyecto_final.proyecto_final.DTO.Response;
 
 import com.proyecto_final.proyecto_final.Enums.Rol;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UsuarioDTO {
+public class UsuarioResponseDTO {
     private Long id;
     private String nombre;
     private String apellido;
