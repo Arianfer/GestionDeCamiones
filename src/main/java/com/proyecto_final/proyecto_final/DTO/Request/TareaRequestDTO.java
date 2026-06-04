@@ -13,6 +13,6 @@ public class TareaRequestDTO {
     private LocalDateTime fechaEjecucion;
     private EstadoTarea estado;
     private Long idCamion;
-    private Integer idRuta;
-    private Integer idUsuario;
+    private Long idRuta;
+    private Long idUsuario;
 }

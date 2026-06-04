@@ -13,7 +13,7 @@ public class TareaResponseDTO {
     private String descripcion;
     private LocalDateTime fechaEjecucion;
     private EstadoTarea estado;
-    private CamionResponseDTO camion;
-    private RutaResponseDTO ruta;
-    private UsuarioResponseDTO usuario;
+    private Long idCamion;
+    private Long idRuta;
+    private Long idUsuario;
 }
