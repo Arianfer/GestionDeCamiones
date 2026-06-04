@@ -8,7 +8,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class RutaResponseDTO {
-    private Integer id;
+    private Integer idRuta;
     private String nombre;
     private String descripcion;
     private List<ServicioResponseDTO> servicios;
