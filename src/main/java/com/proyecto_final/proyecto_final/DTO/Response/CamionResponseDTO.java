@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CamionResponseDTO {
-    private Integer id;
+    private Long id;
     private String patente;
     private String tipo;
     private EstadoCamion estado;
