@@ -3,3 +3,8 @@ Es un sistema de gestión operativa para empresas de recolección de residuos. P
 
 # Stack tecnico / Herramientas utilizadas
 Java + Spring Boot, JPA/Hibernate, base de datos relacional. API REST lista para ser consumida por cualquier frontend o app mobile.
+
+# Equipo
+Devs: Agustin Christensen
+      Walter Diaz
+      Arian Shaffer
