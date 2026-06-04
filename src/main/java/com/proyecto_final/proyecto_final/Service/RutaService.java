@@ -2,7 +2,7 @@ package com.proyecto_final.proyecto_final.Service;
 
 import com.proyecto_final.proyecto_final.Model.Ruta;
 import com.proyecto_final.proyecto_final.Repository.RutaRepository;
-import com.proyecto_final.proyecto_final.excepcion.RutaSinServiciosException;
+import com.proyecto_final.proyecto_final.excepcion.RutaNoHalladaException;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +59,7 @@ public class RutaService {
         Ruta ruta = buscarPorId(id);
         if (ruta.getServicios() == null || ruta.getServicios().isEmpty()) {
             // LANZAR ACÁ:
-            throw new RutaSinServiciosException("La ruta '" + ruta.getNombre() + "' no tiene puntos de recolección asignados todavía.");
+            throw new RutaNoHalladaException("La ruta '" + ruta.getNombre() + "' no tiene puntos de recolección asignados todavía.");
         }
         return ruta;
     }

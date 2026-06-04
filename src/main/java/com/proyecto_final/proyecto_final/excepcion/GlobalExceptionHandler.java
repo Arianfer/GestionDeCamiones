@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             CamionNoDisponibleException.class,
             PatenteInvalidaException.class,
-            RutaSinServiciosException.class,
+            RutaNoHalladaException.class,
             UsuarioDesactivadoException.class
     })
     public ResponseEntity<Map<String, Object>> manejarExcepcionesDeNegocio(RuntimeException ex) {
