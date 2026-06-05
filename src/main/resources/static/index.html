@@ -1,10 +1,304 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciageser S.A. - Panel de Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
+<nav class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50 shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wider text-emerald-400 flex items-center gap-2">
+            🚛 CIAGESER S.A. <span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full font-normal">v1.0-Backend-Ok</span>
+        </h1>
+        <div class="flex gap-4">
+            <button onclick="cambiarPestana('clientes')" id="btn-tab-clientes" class="px-4 py-2 rounded-lg font-medium bg-emerald-600 text-white transition-all">🏢 Clientes</button>
+            <button onclick="cambiarPestana('servicios')" id="btn-tab-servicios" class="px-4 py-2 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition-all">📍 Puntos de Servicio</button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto p-6">
+
+    <section id="tab-clientes" class="space-y-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl h-fit">
+                <h2 class="text-lg font-bold text-emerald-400 mb-4 flex items-center gap-2">➕ Registrar Empresa</h2>
+                <form id="form-cliente" onsubmit="guardarCliente(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">CUIT</label>
+                        <input type="text" id="cli-cuit" required placeholder="Ej: 30123456789" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 text-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Razón Social</label>
+                        <input type="text" id="cli-razonSocial" required placeholder="Ej: Churros Manolo S.A." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 text-slate-200">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl shadow-lg transition-all">Guardar Cliente</button>
+                </form>
+            </div>
+            <div class="lg:col-span-2 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <h2 class="text-lg font-bold text-slate-200 mb-4 flex justify-between items-center">
+                    <span>🏢 Empresas Registradas</span>
+                    <button onclick="cargarClientes()" class="text-xs text-emerald-400 hover:underline">🔄 Actualizar</button>
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                        <tr class="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
+                            <th class="py-3 px-4">ID</th>
+                            <th class="py-3 px-4">CUIT</th>
+                            <th class="py-3 px-4">Razón Social</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabla-clientes-cuerpo" class="divide-y divide-slate-700/50 text-sm">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tab-servicios" class="hidden space-y-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <h2 class="text-lg font-bold text-emerald-400 mb-4">➕ Nuevo Punto de Recolección</h2>
+                <form id="form-servicio" onsubmit="guardarServicio(event)" class="space-y-3 text-sm">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Nombre Lugar</label>
+                            <input type="text" id="ser-nombre" required placeholder="Manolo Centro" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Dirección</label>
+                            <input type="text" id="ser-direccion" required placeholder="Rivadavia 2371" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Prioridad</label>
+                            <select id="ser-prioridad" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none text-slate-300">
+                                <option value="BAJA">BAJA</option>
+                                <option value="MEDIA">MEDIA</option>
+                                <option value="ALTA">ALTA</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Residuo</label>
+                            <select id="ser-tipoResiduo" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none text-slate-300">
+                                <option value="GENERAL">GENERAL</option>
+                                <option value="RECICLABLE">RECICLABLE</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Frecuencia</label>
+                            <select id="ser-frecuencia" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none text-slate-300">
+                                <option value="DIARIA">DIARIA</option>
+                                <option value="SEMANAL">SEMANAL</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Latitud</label>
+                            <input type="number" step="any" id="ser-latitud" required value="-38.0016" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Longitud</label>
+                            <input type="number" step="any" id="ser-longitud" required value="-57.5459" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Orden</label>
+                            <input type="number" id="ser-orden" required value="1" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">ID Ruta Asignada</label>
+                            <input type="number" id="ser-idRuta" required placeholder="Ej: 1" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">ID Cliente (Dueño)</label>
+                            <input type="number" id="ser-idCliente" required placeholder="Ej: 1" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 focus:outline-none">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl shadow-lg transition-all mt-2">Registrar Punto</button>
+                </form>
+            </div>
+            <div class="lg:col-span-2 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <h2 class="text-lg font-bold text-slate-200 mb-4 flex justify-between items-center">
+                    <span>📍 Puntos de Recolección de Residuos</span>
+                    <button onclick="cargarServicios()" class="text-xs text-emerald-400 hover:underline">🔄 Actualizar</button>
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                        <tr class="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
+                            <th class="py-3 px-2">ID</th>
+                            <th class="py-3 px-2">Nombre</th>
+                            <th class="py-3 px-2">Dirección</th>
+                            <th class="py-3 px-2">Prioridad</th>
+                            <th class="py-3 px-2">Tipo</th>
+                            <th class="py-3 px-2">Orden</th>
+                            <th class="py-3 px-2">Ruta</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabla-servicios-cuerpo" class="divide-y divide-slate-700/50 text-xs">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // URLs relativas al servidor actual
+    const API_CLIENTES = '/api/clientes';
+    const API_SERVICIOS = '/api/servicios';
+
+    // Ejecutar carga inicial al abrir la pagina
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarClientes();
+        cargarServicios();
+    });
+
+    // Control de Pestañas
+    function cambiarPestana(tab) {
+        const tabClientes = document.getElementById('tab-clientes');
+        const tabServicios = document.getElementById('tab-servicios');
+        const btnClientes = document.getElementById('btn-tab-clientes');
+        const btnServicios = document.getElementById('btn-tab-servicios');
+
+        if(tab === 'clientes') {
+            tabClientes.classList.remove('hidden');
+            tabServicios.classList.add('hidden');
+            btnClientes.className = "px-4 py-2 rounded-lg font-medium bg-emerald-600 text-white transition-all";
+            btnServicios.className = "px-4 py-2 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition-all";
+        } else {
+            tabClientes.classList.add('hidden');
+            tabServicios.classList.remove('hidden');
+            btnClientes.className = "px-4 py-2 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition-all";
+            btnServicios.className = "px-4 py-2 rounded-lg font-medium bg-emerald-600 text-white transition-all";
+        }
+    }
+
+    // ==================== OPERACIONES CLIENTE ====================
+    async function cargarClientes() {
+        try {
+            const response = await fetch(API_CLIENTES);
+            const clientes = await response.json();
+            const tabla = document.getElementById('tabla-clientes-cuerpo');
+            tabla.innerHTML = '';
+
+            clientes.forEach(c => {
+                tabla.innerHTML += `
+                        <tr class="hover:bg-slate-700/30 transition-all">
+                            <td class="py-3 px-4 font-bold text-emerald-400">${c.id}</td>
+                            <td class="py-3 px-4 text-slate-300 font-mono">${c.cuit}</td>
+                            <td class="py-3 px-4 text-white">${c.razonSocial}</td>
+                        </tr>
+                    `;
+            });
+        } catch (error) {
+            console.error("Error cargando clientes:", error);
+        }
+    }
+
+    async function guardarCliente(e) {
+        e.preventDefault();
+        const payload = {
+            cuit: document.getElementById('cli-cuit').value,
+            razonSocial: document.getElementById('cli-razonSocial').value
+        };
+
+        try {
+            const response = await fetch(API_CLIENTES, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert("¡Empresa registrada con éxito!");
+                document.getElementById('form-cliente').reset();
+                cargarClientes();
+            } else {
+                const errData = await response.json();
+                alert(`Error: ${errData.error || 'No se pudo guardar'}`);
+            }
+        } catch (error) {
+            alert("Error de conexión con el servidor backend.");
+        }
+    }
+
+    // ==================== OPERACIONES SERVICIO ====================
+    async function cargarServicios() {
+        try {
+            const response = await fetch(API_SERVICIOS);
+            const servicios = await response.json();
+            const tabla = document.getElementById('tabla-servicios-cuerpo');
+            tabla.innerHTML = '';
+
+            servicios.forEach(s => {
+                let colorPrioridad = s.prioridad === 'ALTA' ? 'text-red-400 bg-red-500/10' : s.prioridad === 'MEDIA' ? 'text-yellow-400 bg-yellow-500/10' : 'text-slate-400 bg-slate-500/10';
+                tabla.innerHTML += `
+                        <tr class="hover:bg-slate-700/30 transition-all">
+                            <td class="py-3 px-2 font-bold text-emerald-400">${s.id}</td>
+                            <td class="py-3 px-2 text-white font-medium">${s.nombre}</td>
+                            <td class="py-3 px-2 text-slate-300">${s.direccion}</td>
+                            <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${colorPrioridad}">${s.prioridad}</span></td>
+                            <td class="py-3 px-2 text-slate-400">${s.tipoResiduo}</td>
+                            <td class="py-3 px-2 text-center font-bold text-slate-200">${s.orden}</td>
+                            <td class="py-3 px-2 text-slate-400">ID: ${s.idRuta}</td>
+                        </tr>
+                    `;
+            });
+        } catch (error) {
+            console.error("Error cargando servicios:", error);
+        }
+    }
+
+    async function guardarService(payload) {
+        const response = await fetch(API_SERVICIOS, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        return response;
+    }
+
+    async function guardarServicio(e) {
+        e.preventDefault();
+        const payload = {
+            nombre: document.getElementById('ser-nombre').value,
+            prioridad: document.getElementById('ser-prioridad').value,
+            direccion: document.getElementById('ser-direccion').value,
+            tipoResiduo: document.getElementById('ser-tipoResiduo').value,
+            frecuencia: document.getElementById('ser-frecuencia').value,
+            latitud: parseFloat(document.getElementById('ser-latitud').value),
+            longitud: parseFloat(document.getElementById('ser-longitud').value),
+            orden: parseInt(document.getElementById('ser-orden').value),
+            idRuta: parseInt(document.getElementById('ser-idRuta').value),
+            idCliente: parseInt(document.getElementById('ser-idCliente').value)
+        };
+
+        try {
+            const response = await guardarService(payload);
+
+            if (response.ok) {
+                alert("¡Punto de servicio guardado correctamente!");
+                document.getElementById('form-servicio').reset();
+                cargarServicios();
+            } else {
+                const errData = await response.json();
+                alert(`Error (${response.status}): ${errData.error || 'Revisá que existan los IDs de ruta y cliente en la Base de Datos.'}`);
+            }
+        } catch (error) {
+            alert("Error de conexión al guardar el punto de servicio.");
+        }
+    }
+</script>
 </body>
 </html>
