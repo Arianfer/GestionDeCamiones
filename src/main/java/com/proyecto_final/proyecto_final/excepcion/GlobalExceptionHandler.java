@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -29,13 +30,16 @@ public class GlobalExceptionHandler {
     }
 
     // 2. Manejador secundario por si se escapa cualquier otro error genérico (Internal Server Error - 500)
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> manejarErroresGenericos(Exception ex) {
-        Map<String, Object> cuerpo = new HashMap<>();
-        cuerpo.put("timestamp", LocalDateTime.now());
-        cuerpo.put("error", "Ocurrió un error interno en el servidor: " + ex.getMessage());
-        cuerpo.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> manejarNoEncontrado(
+            NoResourceFoundException ex) {
 
-        return new ResponseEntity<>(cuerpo, HttpStatus.INTERNAL_SERVER_ERROR);
+        Map<String, Object> cuerpo = new HashMap<>();
+
+        cuerpo.put("timestamp", LocalDateTime.now());
+        cuerpo.put("error", ex.getMessage());
+        cuerpo.put("status", HttpStatus.NOT_FOUND.value());
+
+        return new ResponseEntity<>(cuerpo, HttpStatus.NOT_FOUND);
     }
 }
