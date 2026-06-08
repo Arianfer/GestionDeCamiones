@@ -1,5 +1,6 @@
 package com.proyecto_final.proyecto_final.Controller;
 
+import com.proyecto_final.proyecto_final.DTO.Request.UsuarioLoginRequestDTO;
 import com.proyecto_final.proyecto_final.DTO.Response.UsuarioResponseDTO;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Service.UsuarioService;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/usuario")
+@RequestMapping("/api/usuarios")
 @RequiredArgsConstructor
 
 public class UsuarioController {
@@ -51,5 +52,19 @@ public class UsuarioController {
                 .rol(usuario.getRol())
                 .activo(usuario.isActivo())
                 .build();
+    }
+
+    @PostMapping("/login")
+    public UsuarioResponseDTO login(@RequestBody UsuarioLoginRequestDTO loginRequest) {
+        // Ahora le pasamos el DNI en vez del Email
+        Usuario usuario = usuarioService.autenticar(loginRequest.getDni(), loginRequest.getPassword());
+        return toDto(usuario);
+    }
+
+    // Buscar usuario por DNI
+    @GetMapping("/dni/{dni}")
+    public UsuarioResponseDTO buscarPorDni(@PathVariable String dni) {
+        Usuario usuario = usuarioService.buscarPorDni(dni);
+        return toDto(usuario); // Asumiendo que tenés un método toDto acá también
     }
 }

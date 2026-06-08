@@ -21,6 +21,17 @@ public class UsuarioService {
         if (usuarioRepository.existsByDni(usuario.getDni())) {
             throw new RuntimeException("Ya existe un usuario con ese DNI");
         }
+
+        // --- ASIGNACIÓN DE CONTRASEÑA AUTOMÁTICA ---
+        if (usuario.getDni() == null || usuario.getDni().length() < 4) {
+            throw new RuntimeException("El DNI debe tener al menos 4 números para generar la contraseña.");
+        }
+        // Le asigna como password los últimos 4 dígitos del DNI ingresado
+        usuario.setPassword(usuario.getDni().substring(usuario.getDni().length() - 4));
+
+        // Lo activamos por defecto al crearlo
+        usuario.setActivo(true);
+
         return usuarioRepository.save(usuario);
     }
 
@@ -38,8 +49,15 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
     }
 
-    public Usuario autenticar(String email, String password) {
-        Usuario usuario = buscarPorEmail(email);
+    // Nuevo método para buscar por DNI
+    public Usuario buscarPorDni(String dni) {
+        return usuarioRepository.findByDni(dni)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con DNI: " + dni));
+    }
+
+    // Autenticación cambiada para que pida el DNI en vez del Email
+    public Usuario autenticar(String dni, String password) {
+        Usuario usuario = buscarPorDni(dni);
 
         if (!usuario.isActivo()) {
             throw new UsuarioDesactivadoException("El usuario se encuentra inactivo en el sistema de Ciageser");

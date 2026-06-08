@@ -18,7 +18,7 @@ public class AuthController {
     @PostMapping("/login")
     public UsuarioResponseDTO login(@RequestBody UsuarioLoginRequestDTO loginRequest) {
         // El servicio verifica si el usuario existe, si está activo y si la pass coincide
-        Usuario usuario = usuarioService.autenticar(loginRequest.getEmail(), loginRequest.getPassword());
+        Usuario usuario = usuarioService.autenticar(loginRequest.getDni(), loginRequest.getPassword());
         return toDto(usuario);
     }
 

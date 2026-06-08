@@ -1,11 +1,13 @@
 package com.proyecto_final.proyecto_final.DTO.Response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.proyecto_final.proyecto_final.Enums.Rol;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
