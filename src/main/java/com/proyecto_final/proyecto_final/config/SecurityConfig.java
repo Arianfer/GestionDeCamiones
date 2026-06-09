@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authRequest ->
                         authRequest
 
-                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/usuarios/**").hasAnyRole("ADMIN", "OFICINA")
 
                                 .requestMatchers(
                                         "/",
