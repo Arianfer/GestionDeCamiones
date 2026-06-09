@@ -2,6 +2,7 @@ package com.proyecto_final.proyecto_final.Controller;
 
 import com.proyecto_final.proyecto_final.DTO.Request.RutaRequestDTO;
 import com.proyecto_final.proyecto_final.DTO.Response.RutaResponseDTO;
+import com.proyecto_final.proyecto_final.DTO.Response.ServicioResponseDTO;
 import com.proyecto_final.proyecto_final.Model.Ruta;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Service.RutaService;
@@ -79,16 +80,37 @@ public class RutaController {
     }
 
     private RutaResponseDTO convertirADto(Ruta ruta) {
+        // 1. Mapeamos la lista de Servicios a DTOs (si es que la ruta tiene servicios asignados)
+        List<ServicioResponseDTO> listaServicios = null;
+
+        if (ruta.getServicios() != null && !ruta.getServicios().isEmpty()) {
+            listaServicios = ruta.getServicios().stream()
+                    .map(servicio -> ServicioResponseDTO.builder()
+                            .id(servicio.getId())
+                            .nombre(servicio.getNombre())
+                            .prioridad(servicio.getPrioridad())
+                            .direccion(servicio.getDireccion())
+                            .tipoResiduo(servicio.getTipoResiduo())
+                            .frecuencia(servicio.getFrecuencia())
+                            .latitud(servicio.getLatitud())
+                            .longitud(servicio.getLongitud())
+                            .orden(servicio.getOrden())
+                            // Evitamos errores de NullPointer si un servicio no tiene ruta o cliente explícito cargado en memoria
+                            .idRuta(ruta.getIdRuta())
+                            .idCliente(servicio.getCliente() != null ? servicio.getCliente().getId() : null)
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
+        // 2. Armamos el DTO principal
         return RutaResponseDTO.builder()
                 .idRuta(ruta.getIdRuta())
                 .nombre(ruta.getNombre())
                 .descripcion(ruta.getDescripcion())
                 .fecha(ruta.getFecha())
-                // Si tiene chofer asignado, sacamos sus datos para mostrarlos en la tablita
                 .idChofer(ruta.getChofer() != null ? ruta.getChofer().getId() : null)
                 .nombreChofer(ruta.getChofer() != null ? ruta.getChofer().getNombre() + " " + ruta.getChofer().getApellido() : null)
-                // Por ahora pasamos la lista de servicios vacía/null hasta que armemos esa lógica
-                .servicios(null)
+                .servicios(listaServicios) // <-- ¡Acá inyectamos la lista ya procesada!
                 .build();
     }
 }
