@@ -2,6 +2,8 @@ package com.proyecto_final.proyecto_final.Model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -24,4 +26,12 @@ public class Ruta {
 
     @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL)
     private List<Servicio> servicios;
+
+    private LocalDate fecha;
+
+    @ManyToOne
+    @JoinColumn(name = "id_chofer")
+    private Usuario chofer;
+
+
 }
