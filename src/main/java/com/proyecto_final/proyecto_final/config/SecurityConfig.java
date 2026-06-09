@@ -31,9 +31,20 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                .requestMatchers("/api/auth/**").permitAll() // El login es libre para todos
-                                .requestMatchers("/api/usuarios/**").hasAnyRole("ADMIN", "OFICINA") // Solo los jefes pueden crear usuarios
-                                .anyRequest().authenticated() // Cualquier otra ruta requiere estar logueado
+
+                                .requestMatchers("/api/auth/**").permitAll()
+
+                                .requestMatchers(
+                                        "/",
+                                        "/index.html",
+                                        "/swagger-ui/**",    //Ahora tambien permite el acceso a la documentación de Swagger sin autenticación
+                                        "/v3/api-docs/**"
+                                ).permitAll()
+
+                                .requestMatchers("/api/usuarios/**")
+                                .hasAnyRole("ADMIN", "OFICINA")
+
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
                         sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
