@@ -31,15 +31,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                              // 1. Permitimos TODAS las consultas previas del navegador (El fix del 403)
+                                // 1. Permitimos peticiones previas de seguridad (CORS)
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                // 2. El login es libre para todos
+
+                                // 2. HTML y estáticos libres para que cargue la web
+                                .requestMatchers("/", "/index.html").permitAll()
+
+                                // 3. Login libre para que todos puedan iniciar sesión
                                 .requestMatchers("/api/auth/**").permitAll()
 
-                                .requestMatchers("/", "/index.html").permitAll()
-                                // 3. Solo los jefes pueden gestionar usuarios
+                                // 4. 🔒 CANDADO PUESTO: Solo jefes pueden gestionar/crear usuarios
                                 .requestMatchers("/api/usuarios/**").hasAnyRole("ADMIN", "OFICINA")
-                                // 4. Cualquier otra ruta requiere estar logueado con un token válido
+
+                                // 5. Todo lo demás (clientes, camiones, recorridos) requiere estar logueado
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
@@ -54,7 +58,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource configuracionCors() {
         CorsConfiguration config = new CorsConfiguration();
-        // Permite peticiones desde Angular, Postman o el HTML local
         config.setAllowedOrigins(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

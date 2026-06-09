@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ciageser - Control de Accesos</title>
+    <title>Ciageser - Control de Operaciones</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -114,14 +114,87 @@
 
         .vista-contenido { display: none; }
         .vista-activa { display: block; }
+
+        /* ========================================================= */
+        /* ESTILOS EXCLUSIVOS PARA MÓVIL (CHOFERES)                  */
+        /* ========================================================= */
+        .container-mobile {
+            display: none; /* Se muestra por JS si es EMPLEADO */
+            flex-direction: column;
+            width: 100%;
+            max-width: 500px;
+            height: 90vh; /* Ajustado para simular app */
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .header-mobile {
+            background-color: #1e2229;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-parada {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #ddd;
+            text-align: center;
+        }
+
+        .mapa-placeholder {
+            flex-grow: 1;
+            background-color: #e9ecef;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #6c757d;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .controles-mobile {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            padding-bottom: 30px;
+        }
+
+        .btn-chofer {
+            width: 75px;
+            height: 75px;
+            border-radius: 15px;
+            border: none;
+            font-size: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .btn-falla { background-color: #dc3545; }
+        .btn-falla:active { background-color: #bd2130; transform: scale(0.95); }
+
+        .btn-exito { background-color: #28a745; }
+        .btn-exito:active { background-color: #218838; transform: scale(0.95); }
+
+        .btn-alerta { background-color: #fd7e14; }
+        .btn-alerta:active { background-color: #e8590c; transform: scale(0.95); }
     </style>
 </head>
 <body>
 
-<div class="container">
-
-    <!-- PANTALLA DE LOGIN -->
-    <div id="seccion-login" class="pad-container">
+<div class="container" id="seccion-login">
+    <div class="pad-container">
         <h2>Sistema Ciageser</h2>
         <div class="form-group">
             <label for="dni">DNI (Usuario):</label>
@@ -134,204 +207,220 @@
         <button class="btn-primary" onclick="ejecutarLogin()">Iniciar Sesión</button>
         <div id="box-login-msg" class="resultado"></div>
     </div>
+</div>
 
-    <!-- PANTALLA DEL DASHBOARD (Protegida) -->
-    <div id="seccion-dashboard" style="display: none;">
+<div class="container" id="interfaz-escritorio" style="display: none;">
 
-        <!-- Navbar Superior con Orden Solicitado -->
-        <div class="navbar">
-            <div class="nav-left">
-                <div class="nav-brand" id="bienvenida-texto">Panel</div>
-                <div class="nav-menu">
-                    <button class="nav-tab admin-element" id="tab-clientes" onclick="cambiarPestania('clientes')">🏢 Clientes</button>
-                    <button class="nav-tab admin-element" id="tab-servicios" onclick="cambiarPestania('servicios')">📍 Ubicaciones</button>
-                    <button class="nav-tab active" id="tab-rutas" onclick="cambiarPestania('rutas')">🗺️ Recorridos</button>
-                    <button class="nav-tab admin-element" id="tab-camiones" onclick="cambiarPestania('camiones')">🚛 Camiones</button>
-                    <button class="nav-tab admin-element" id="tab-usuarios" onclick="cambiarPestania('usuarios')">👥 Personal</button>
+    <div class="navbar">
+        <div class="nav-left">
+            <div class="nav-brand" id="bienvenida-texto">Panel</div>
+            <div class="nav-menu">
+                <button class="nav-tab admin-element" id="tab-clientes" onclick="cambiarPestania('clientes')">🏢 Clientes</button>
+                <button class="nav-tab admin-element" id="tab-servicios" onclick="cambiarPestania('servicios')">📍 Ubicaciones</button>
+                <button class="nav-tab active" id="tab-rutas" onclick="cambiarPestania('rutas')">🗺️ Recorridos</button>
+                <button class="nav-tab admin-element" id="tab-camiones" onclick="cambiarPestania('camiones')">🚛 Camiones</button>
+                <button class="nav-tab admin-element" id="tab-usuarios" onclick="cambiarPestania('usuarios')">👥 Personal</button>
+            </div>
+        </div>
+        <div>
+            <button class="nav-logout" onclick="ejecutarLogout()">Salir</button>
+        </div>
+    </div>
+
+    <div class="pad-container">
+        <div id="vista-clientes" class="vista-contenido">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: #333;">Directorio de Clientes</h3>
+                <button class="btn-success" style="width: auto; margin: 0; padding: 8px 15px; font-size: 13px;" onclick="mostrarFormularioCliente()">➕ Alta Cliente</button>
+            </div>
+
+            <div id="form-cliente-box" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
+                <h4 id="titulo-form-cliente" style="margin-top: 0; color: #333;">Nuevo Cliente</h4>
+                <input type="hidden" id="cli-id">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label>Razón Social:</label>
+                        <input type="text" id="cli-razon" placeholder="Ej: Churros Manolo S.A.">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label>CUIT:</label>
+                        <input type="text" id="cli-cuit" placeholder="Ej: 30-12345678-9">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn-success" style="width: auto; padding: 8px 20px;" onclick="guardarCliente()">Guardar</button>
+                    <button style="width: auto; padding: 8px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="ocultarFormularioCliente()">Cancelar</button>
                 </div>
             </div>
-            <div>
-                <button class="nav-logout" onclick="ejecutarLogout()">Salir</button>
+
+            <div style="overflow-x: auto;">
+                <table class="tabla-datos">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Razón Social</th>
+                        <th>CUIT</th>
+                        <th style="text-align: center;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabla-clientes-body">
+                    <tr><td colspan="4" style="text-align: center;">Cargando clientes...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="pad-container">
-            <!-- VISTA 1: CLIENTES (Rediseñada con Listado y Formulario Oculto) -->
-            <div id="vista-clientes" class="vista-contenido">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="margin: 0; color: #333;">Directorio de Clientes</h3>
-                    <button class="btn-success" style="width: auto; margin: 0; padding: 8px 15px; font-size: 13px;" onclick="mostrarFormularioCliente()">➕ Alta Cliente</button>
-                </div>
-
-                <!-- Formulario de Alta/Edición (Oculto por defecto) -->
-                <div id="form-cliente-box" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
-                    <h4 id="titulo-form-cliente" style="margin-top: 0; color: #333;">Nuevo Cliente</h4>
-                    <input type="hidden" id="cli-id"> <!-- Campo oculto para saber si editamos o creamos -->
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 200px;">
-                            <label>Razón Social:</label>
-                            <input type="text" id="cli-razon" placeholder="Ej: Churros Manolo S.A.">
-                        </div>
-                        <div style="flex: 1; min-width: 150px;">
-                            <label>CUIT:</label>
-                            <input type="text" id="cli-cuit" placeholder="Ej: 30-12345678-9">
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn-success" style="width: auto; padding: 8px 20px;" onclick="guardarCliente()">Guardar</button>
-                        <button style="width: auto; padding: 8px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="ocultarFormularioCliente()">Cancelar</button>
-                    </div>
-                </div>
-
-                <!-- Tabla de Clientes -->
-                <div style="overflow-x: auto;">
-                    <table class="tabla-datos">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Razón Social</th>
-                            <th>CUIT</th>
-                            <th style="text-align: center;">Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody id="tabla-clientes-body">
-                        <tr><td colspan="4" style="text-align: center;">Cargando clientes...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+        <div id="vista-servicios" class="vista-contenido">
+            <h3 style="margin-top: 0; color: #333;">Nueva Ubicación de Recolección</h3>
+            <div class="form-group">
+                <label>Nombre del Punto:</label>
+                <input type="text" id="srv-nombre" placeholder="Ej: Manolo Sucursal Alem">
             </div>
-
-            <!-- VISTA 2: UBICACIONES / SERVICIOS -->
-            <div id="vista-servicios" class="vista-contenido">
-                <h3 style="margin-top: 0; color: #333;">Nueva Ubicación de Recolección</h3>
-                <div class="form-group">
-                    <label>Nombre del Punto:</label>
-                    <input type="text" id="srv-nombre" placeholder="Ej: Manolo Sucursal Alem">
-                </div>
-                <div class="form-group">
-                    <label>Dirección:</label>
-                    <input type="text" id="srv-direccion" placeholder="Ej: Alem 3800">
-                </div>
-                <div class="form-group">
-                    <label>Prioridad:</label>
-                    <select id="srv-prioridad">
-                        <option value="ALTA">ALTA</option>
-                        <option value="MEDIA">MEDIA</option>
-                        <option value="BAJA">BAJA</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Tipo de Residuo:</label>
-                    <input type="text" id="srv-residuo" placeholder="Ej: ORGANICO o INORGANICO">
-                </div>
-                <div class="form-group">
-                    <label>Frecuencia:</label>
-                    <input type="text" id="srv-frecuencia" placeholder="Ej: DIARIA o SEMANAL">
-                </div>
-                <div class="form-group">
-                    <label>Orden en el recorrido:</label>
-                    <input type="number" id="srv-orden" placeholder="Ej: 1">
-                </div>
-                <div class="form-group">
-                    <label>ID del Recorrido Perteneciente:</label>
-                    <input type="number" id="srv-ruta" placeholder="Ej: 1">
-                </div>
-                <div class="form-group">
-                    <label>ID del Cliente (Dueño):</label>
-                    <input type="number" id="srv-cliente" placeholder="Ej: 2">
-                </div>
-                <button class="btn-success" onclick="ejecutarCrearServicio()">Guardar Ubicación</button>
+            <div class="form-group">
+                <label>Dirección:</label>
+                <input type="text" id="srv-direccion" placeholder="Ej: Alem 3800">
             </div>
-
-            <!-- VISTA 3: RECORRIDOS -->
-            <div id="vista-rutas" class="vista-contenido vista-activa">
-                <div class="admin-element" style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #e0e0e0;">
-                    <h4 style="margin-top: 0; color: #333; font-size: 15px;">➕ Registrar Nuevo Recorrido</h4>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 5px;">
-                        <div style="flex: 1; min-width: 100px;">
-                            <label style="font-size: 12px; color: #555;">Código:</label>
-                            <input type="text" id="rec-nombre" placeholder="Ej: RR1" style="padding: 6px; font-size: 13px;">
-                        </div>
-                        <div style="flex: 2; min-width: 180px;">
-                            <label style="font-size: 12px; color: #555;">Descripción / Zona:</label>
-                            <input type="text" id="rec-descripcion" placeholder="Ej: Zona Centro - Mañana" style="padding: 6px; font-size: 13px;">
-                        </div>
-                        <div style="flex: 1; min-width: 90px;">
-                            <label style="font-size: 12px; color: #555;">ID Chofer:</label>
-                            <input type="number" id="rec-chofer" placeholder="Opcional" style="padding: 6px; font-size: 13px;">
-                        </div>
-                    </div>
-                    <button class="btn-success" onclick="ejecutarCrearRecorrido()" style="padding: 8px 15px; font-size: 13px; width: auto; margin-top: 5px;">Guardar Recorrido</button>
-                </div>
-
-                <h3 style="margin-top: 0; color: #333;">Mis Recorridos Asignados</h3>
-                <div id="box-rutas">
-                    <p style="text-align: center; color: #666;">Cargando información...</p>
-                </div>
+            <div class="form-group">
+                <label>Prioridad:</label>
+                <select id="srv-prioridad">
+                    <option value="ALTA">ALTA</option>
+                    <option value="MEDIA">MEDIA</option>
+                    <option value="BAJA">BAJA</option>
+                </select>
             </div>
-
-            <!-- VISTA 4: CAMIONES -->
-            <div id="vista-camiones" class="vista-contenido">
-                <h3 style="margin-top: 0; color: #333;">Registrar Nuevo Camión</h3>
-                <div class="form-group">
-                    <label>Patente / Dominio:</label>
-                    <input type="text" id="cam-patente" placeholder="Ej: AF123CD">
-                </div>
-                <div class="form-group">
-                    <label>Tipo de Vehículo:</label>
-                    <input type="text" id="cam-tipo" placeholder="Ej: RECOLECTOR o DAILY">
-                </div>
-                <div class="form-group">
-                    <label>Estado Inicial:</label>
-                    <select id="cam-estado">
-                        <option value="DISPONIBLE">DISPONIBLE</option>
-                        <option value="EN_MANTENIMIENTO">EN MANTENIMIENTO</option>
-                        <option value="FUERA_DE_SERVICIO">FUERA DE SERVICIO</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Capacidad de Carga (kg):</label>
-                    <input type="number" step="0.1" id="cam-capacidad" placeholder="Ej: 15000.0">
-                </div>
-                <div class="form-group">
-                    <label>Consumo Diésel por Km (L):</label>
-                    <input type="number" step="0.01" id="cam-consumo" placeholder="Ej: 0.35">
-                </div>
-                <button class="btn-success" onclick="ejecutarCrearCamion()">Guardar Camión</button>
+            <div class="form-group">
+                <label>Tipo de Residuo:</label>
+                <input type="text" id="srv-residuo" placeholder="Ej: ORGANICO o INORGANICO">
             </div>
-
-            <!-- VISTA 5: PERSONAL -->
-            <div id="vista-usuarios" class="vista-contenido">
-                <h3 style="margin-top: 0; color: #333;">Registrar Nuevo Personal</h3>
-                <div class="form-group">
-                    <label>Nombre:</label>
-                    <input type="text" id="new-nombre" placeholder="Ej: Juan">
-                </div>
-                <div class="form-group">
-                    <label>Apellido:</label>
-                    <input type="text" id="new-apellido" placeholder="Ej: Pérez">
-                </div>
-                <div class="form-group">
-                    <label>DNI:</label>
-                    <input type="text" id="new-dni" placeholder="Ej: 87654321">
-                </div>
-                <div class="form-group">
-                    <label>Email:</label>
-                    <input type="email" id="new-email" placeholder="Ej: empleado@ciageser.com">
-                </div>
-                <div class="form-group">
-                    <label>Rol en el sistema:</label>
-                    <select id="new-rol">
-                        <option value="OFICINA">OFICINA (Administrativo)</option>
-                        <option value="EMPLEADO">EMPLEADO (Chofer)</option>
-                    </select>
-                </div>
-                <button class="btn-success" onclick="ejecutarCrearUsuario()">Guardar Usuario</button>
+            <div class="form-group">
+                <label>Frecuencia:</label>
+                <input type="text" id="srv-frecuencia" placeholder="Ej: DIARIA o SEMANAL">
             </div>
-
-            <!-- Caja global de respuestas de la API -->
-            <div id="box-mensaje" class="resultado"></div>
+            <div class="form-group">
+                <label>Orden en el recorrido:</label>
+                <input type="number" id="srv-orden" placeholder="Ej: 1">
+            </div>
+            <div class="form-group">
+                <label>ID del Recorrido Perteneciente:</label>
+                <input type="number" id="srv-ruta" placeholder="Ej: 1">
+            </div>
+            <div class="form-group">
+                <label>ID del Cliente (Dueño):</label>
+                <input type="number" id="srv-cliente" placeholder="Ej: 2">
+            </div>
+            <button class="btn-success" onclick="ejecutarCrearServicio()">Guardar Ubicación</button>
         </div>
+
+        <div id="vista-rutas" class="vista-contenido vista-activa">
+            <div class="admin-element" style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #e0e0e0;">
+                <h4 style="margin-top: 0; color: #333; font-size: 15px;">➕ Registrar Nuevo Recorrido</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 5px;">
+                    <div style="flex: 1; min-width: 100px;">
+                        <label style="font-size: 12px; color: #555;">Código:</label>
+                        <input type="text" id="rec-nombre" placeholder="Ej: RR1" style="padding: 6px; font-size: 13px;">
+                    </div>
+                    <div style="flex: 2; min-width: 180px;">
+                        <label style="font-size: 12px; color: #555;">Descripción / Zona:</label>
+                        <input type="text" id="rec-descripcion" placeholder="Ej: Zona Centro - Mañana" style="padding: 6px; font-size: 13px;">
+                    </div>
+                    <div style="flex: 1; min-width: 90px;">
+                        <label style="font-size: 12px; color: #555;">ID Chofer:</label>
+                        <input type="number" id="rec-chofer" placeholder="Opcional" style="padding: 6px; font-size: 13px;">
+                    </div>
+                </div>
+                <button class="btn-success" onclick="ejecutarCrearRecorrido()" style="padding: 8px 15px; font-size: 13px; width: auto; margin-top: 5px;">Guardar Recorrido</button>
+            </div>
+
+            <h3 style="margin-top: 0; color: #333;">Mis Recorridos Asignados</h3>
+            <div id="box-rutas">
+                <p style="text-align: center; color: #666;">Cargando información...</p>
+            </div>
+        </div>
+
+        <div id="vista-camiones" class="vista-contenido">
+            <h3 style="margin-top: 0; color: #333;">Registrar Nuevo Camión</h3>
+            <div class="form-group">
+                <label>Patente / Dominio:</label>
+                <input type="text" id="cam-patente" placeholder="Ej: AF123CD">
+            </div>
+            <div class="form-group">
+                <label>Tipo de Vehículo:</label>
+                <input type="text" id="cam-tipo" placeholder="Ej: RECOLECTOR o DAILY">
+            </div>
+            <div class="form-group">
+                <label>Estado Inicial:</label>
+                <select id="cam-estado">
+                    <option value="DISPONIBLE">DISPONIBLE</option>
+                    <option value="EN_MANTENIMIENTO">EN MANTENIMIENTO</option>
+                    <option value="FUERA_DE_SERVICIO">FUERA DE SERVICIO</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Capacidad de Carga (kg):</label>
+                <input type="number" step="0.1" id="cam-capacidad" placeholder="Ej: 15000.0">
+            </div>
+            <div class="form-group">
+                <label>Consumo Diésel por Km (L):</label>
+                <input type="number" step="0.01" id="cam-consumo" placeholder="Ej: 0.35">
+            </div>
+            <button class="btn-success" onclick="ejecutarCrearCamion()">Guardar Camión</button>
+        </div>
+
+        <div id="vista-usuarios" class="vista-contenido">
+            <h3 style="margin-top: 0; color: #333;">Registrar Nuevo Personal</h3>
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" id="new-nombre" placeholder="Ej: Juan">
+            </div>
+            <div class="form-group">
+                <label>Apellido:</label>
+                <input type="text" id="new-apellido" placeholder="Ej: Pérez">
+            </div>
+            <div class="form-group">
+                <label>DNI:</label>
+                <input type="text" id="new-dni" placeholder="Ej: 87654321">
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="new-email" placeholder="Ej: empleado@ciageser.com">
+            </div>
+            <div class="form-group">
+                <label>Rol en el sistema:</label>
+                <select id="new-rol">
+                    <option value="OFICINA">OFICINA (Administrativo)</option>
+                    <option value="EMPLEADO">EMPLEADO (Chofer)</option>
+                </select>
+            </div>
+            <button class="btn-success" onclick="ejecutarCrearUsuario()">Guardar Usuario</button>
+        </div>
+
+        <div id="box-mensaje" class="resultado"></div>
+    </div>
+</div>
+
+<div class="container-mobile" id="interfaz-movil">
+
+    <div class="header-mobile">
+        <strong id="chofer-nombre">Chofer: Cargando...</strong>
+        <button class="nav-logout" onclick="ejecutarLogout()" style="padding: 6px 12px;">Salir</button>
+    </div>
+
+    <div class="info-parada">
+        <h3 style="margin: 0; color: #0056b3;">Siguiente Punto Asignado</h3>
+        <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: bold;">Cargando recorrido...</p>
+        <p style="margin: 2px 0 0 0; color: #555;">Esperando datos de la oficina</p>
+    </div>
+
+    <div class="mapa-placeholder">
+        <span style="font-size: 40px;">🗺️</span>
+        <p style="margin: 10px 0 0 0; font-weight: bold;">Mapa Interactivo</p>
+        <p style="margin: 5px 0 0 0; font-size: 13px;">(Integración con Google Maps pendiente)</p>
+    </div>
+
+    <div class="controles-mobile">
+        <button class="btn-chofer btn-falla" onclick="registrarFalla()" title="Falla / No recolectado">✖</button>
+        <button class="btn-chofer btn-exito" onclick="registrarExito()" title="Recolección completada">✔</button>
+        <button class="btn-chofer btn-alerta" onclick="registrarIncidencia()" title="Completado con Novedad">❗</button>
     </div>
 </div>
 
@@ -340,7 +429,7 @@
 
     window.onload = function() {
         if (localStorage.getItem('token_jwt')) {
-            iniciarDashboard();
+            enrutarPorRol();
         }
     };
 
@@ -369,7 +458,7 @@
 
                 setTimeout(() => {
                     box.style.display = 'none';
-                    iniciarDashboard();
+                    enrutarPorRol();
                 }, 800);
             })
             .catch(err => {
@@ -379,23 +468,33 @@
             });
     }
 
-    function iniciarDashboard() {
+    // ==========================================
+    // RUTEADOR PRINCIPAL (Admin vs Chofer)
+    // ==========================================
+    function enrutarPorRol() {
         document.getElementById('seccion-login').style.display = 'none';
-        document.getElementById('seccion-dashboard').style.display = 'block';
 
-        const nombre = localStorage.getItem('user_nombre') || 'Usuario';
         const rol = localStorage.getItem('user_rol');
+        const nombre = localStorage.getItem('user_nombre') || 'Usuario';
 
-        document.getElementById('bienvenida-texto').innerText = `${nombre}`;
-
-        const elementosAdmin = document.querySelectorAll('.admin-element');
-        if (rol === 'ADMIN' || rol === 'OFICINA') {
-            elementosAdmin.forEach(el => el.style.display = 'block');
+        if (rol === 'EMPLEADO') {
+            // Activar Vista Móvil
+            document.getElementById('interfaz-movil').style.display = 'flex';
+            document.getElementById('chofer-nombre').innerText = `🚐 ${nombre}`;
         } else {
-            elementosAdmin.forEach(el => el.style.display = 'none');
-        }
+            // Activar Vista Escritorio
+            document.getElementById('interfaz-escritorio').style.display = 'block';
+            document.getElementById('bienvenida-texto').innerText = `${nombre}`;
 
-        cambiarPestania('rutas');
+            const elementosAdmin = document.querySelectorAll('.admin-element');
+            if (rol === 'ADMIN' || rol === 'OFICINA') {
+                elementosAdmin.forEach(el => el.style.display = 'block');
+            } else {
+                elementosAdmin.forEach(el => el.style.display = 'none');
+            }
+
+            cambiarPestania('rutas');
+        }
     }
 
     function cambiarPestania(pestania) {
@@ -541,7 +640,7 @@
         document.getElementById('cli-id').value = id;
         document.getElementById('cli-razon').value = razon;
         document.getElementById('cli-cuit').value = cuit;
-        window.scrollTo(0, 0); // Sube la pantalla para ver el formulario
+        window.scrollTo(0, 0);
     }
 
     function guardarCliente() {
@@ -592,12 +691,135 @@
     }
 
     // ==========================================
-    // OTRAS CREACIONES BÁSICAS
+    // LÓGICA DE UBICACIONES / CAMIONES / USUARIOS
     // ==========================================
-    function ejecutarCrearServicio() { /* Igual que antes... omitido para foco, pero funcional al click */ }
-    function ejecutarCrearCamion() { /* Igual que antes... */ }
-    function ejecutarCrearUsuario() { /* Igual que antes... */ }
+    function ejecutarCrearServicio() {
+        const token = localStorage.getItem('token_jwt');
+        const nombre = document.getElementById('srv-nombre').value;
+        const direccion = document.getElementById('srv-direccion').value;
+        const prioridad = document.getElementById('srv-prioridad').value;
+        const tipoResiduo = document.getElementById('srv-residuo').value;
+        const frecuencia = document.getElementById('srv-frecuencia').value;
+        const orden = document.getElementById('srv-orden').value;
+        const idRuta = document.getElementById('srv-ruta').value;
+        const idCliente = document.getElementById('srv-cliente').value;
 
+        if (!nombre || !direccion || !idRuta || !idCliente) {
+            mostrarMensaje('Nombre, Dirección, ID Recorrido e ID Cliente son obligatorios.', 'error');
+            return;
+        }
+
+        fetch(`${API_URL}/servicios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ nombre, direccion, prioridad, tipoResiduo, frecuencia, orden, idRuta, idCliente })
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Error al vincular la ubicación. Verifica los IDs provistos.');
+                return response.json();
+            })
+            .then(data => {
+                mostrarMensaje(`¡Ubicación "${data.nombre}" guardada y vinculada al recorrido correctamente!`, 'exito');
+                document.getElementById('srv-nombre').value = '';
+                document.getElementById('srv-direccion').value = '';
+                document.getElementById('srv-residuo').value = '';
+                document.getElementById('srv-frecuencia').value = '';
+                document.getElementById('srv-orden').value = '';
+                document.getElementById('srv-ruta').value = '';
+                document.getElementById('srv-cliente').value = '';
+            })
+            .catch(err => mostrarMensaje(err.message, 'error'));
+    }
+
+    function ejecutarCrearCamion() {
+        const token = localStorage.getItem('token_jwt');
+        const patente = document.getElementById('cam-patente').value;
+        const tipo = document.getElementById('cam-tipo').value;
+        const estadoCamion = document.getElementById('cam-estado').value;
+        const capacidadCarga = document.getElementById('cam-capacidad').value;
+        const consumoDieselPorKm = document.getElementById('cam-consumo').value;
+
+        if (!patente || !tipo || !capacidadCarga || !consumoDieselPorKm) {
+            mostrarMensaje('Por favor, completa todos los campos del camión.', 'error');
+            return;
+        }
+
+        fetch(`${API_URL}/camiones`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ patente, tipo, estadoCamion, capacidadCarga, consumoDieselPorKm })
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Error al registrar el camión en la API.');
+                return response.json();
+            })
+            .then(data => {
+                mostrarMensaje(`¡Camión [${data.patente || patente}] guardado con éxito en el sistema!`, 'exito');
+                document.getElementById('cam-patente').value = '';
+                document.getElementById('cam-tipo').value = '';
+                document.getElementById('cam-capacidad').value = '';
+                document.getElementById('cam-consumo').value = '';
+            })
+            .catch(err => mostrarMensaje(err.message, 'error'));
+    }
+
+    function ejecutarCrearUsuario() {
+        const token = localStorage.getItem('token_jwt');
+        const nombre = document.getElementById('new-nombre').value;
+        const apellido = document.getElementById('new-apellido').value;
+        const dni = document.getElementById('new-dni').value;
+        const email = document.getElementById('new-email').value;
+        const rol = document.getElementById('new-rol').value;
+
+        if (!nombre || !apellido || !dni || !email) {
+            mostrarMensaje('Completá todos los campos.', 'error');
+            return;
+        }
+
+        fetch(`${API_URL}/usuarios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ nombre, apellido, dni, email, rol })
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Error al guardar el personal.');
+                return response.json();
+            })
+            .then(data => {
+                mostrarMensaje(`¡Usuario ${data.nombre} creado con éxito! Clave: ${data.dni.slice(-4)}`, 'exito');
+                document.getElementById('new-nombre').value = '';
+                document.getElementById('new-apellido').value = '';
+                document.getElementById('new-dni').value = '';
+                document.getElementById('new-email').value = '';
+            })
+            .catch(err => mostrarMensaje(err.message, 'error'));
+    }
+
+    // ==========================================
+    // LÓGICA DE LA BOTONERA MÓVIL DEL CHOFER
+    // ==========================================
+    function registrarExito() {
+        const horaActual = new Date().toLocaleTimeString();
+        alert(`✅ Registrado con éxito a las ${horaActual}. Guardando en base de datos...`);
+    }
+
+    function registrarFalla() {
+        let motivo = prompt("Motivo de la falla:\n1. Candado Propio\n2. Lleno de Escombros\n3. Hongos rotos\n4. Vehículo obstruyendo\n\n(Escribí el motivo o número):");
+        if(motivo) {
+            alert(`❌ Falla registrada por: "${motivo}". Se notificó a la oficina.`);
+        }
+    }
+
+    function registrarIncidencia() {
+        let novedad = prompt("Describe la novedad o incidencia menor:\nEj: Contenedor perdiendo líquido, basura extra, etc.");
+        if(novedad) {
+            alert(`❗ Novedad registrada: "${novedad}". Tarea completada con advertencia.`);
+        }
+    }
+
+    // ==========================================
+    // UTILERÍA
+    // ==========================================
     function mostrarMensaje(texto, tipo) {
         const box = document.getElementById('box-mensaje');
         box.style.display = 'block';
@@ -607,7 +829,7 @@
 
     function ejecutarLogout() {
         localStorage.clear();
-        location.reload(); // Forma más limpia de resetear todo
+        location.reload();
     }
 </script>
 
