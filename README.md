@@ -1,6 +1,6 @@
-# Gestión de Camiones - Documentación Técnica
+# Gestión de Camiones
 
-## 1. Descripción General del Sistema
+## Descripción General del Sistema
 
 **Gestión de Camiones** es una API REST desarrollada para empresas dedicadas a la recolección de residuos. El sistema permite administrar camiones, choferes, clientes, rutas, servicios y tareas operativas asociadas a la actividad diaria de recolección.
 
@@ -8,7 +8,7 @@ El objetivo principal es centralizar la gestión de la flota y optimizar la plan
 
 ---
 
-## 2. Integrantes del Grupo
+## Integrantes del Grupo
 
 * Walter Diaz
 * Agustín Christensen
@@ -16,7 +16,7 @@ El objetivo principal es centralizar la gestión de la flota y optimizar la plan
 
 ---
 
-## 3. Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 ### Backend
 
@@ -44,7 +44,7 @@ El objetivo principal es centralizar la gestión de la flota y optimizar la plan
 
 ---
 
-## 4. Instrucciones para Ejecutar el Proyecto
+## Instrucciones para Ejecutar el Proyecto
 
 ### Requisitos Previos
 
@@ -94,7 +94,7 @@ java -jar target/proyecto-final.jar
 
 ---
 
-## 5. Configuración Necesaria
+## Configuración Necesaria
 
 La aplicación requiere:
 
@@ -105,7 +105,7 @@ La aplicación requiere:
 
 ---
 
-## 6. Estructura General del Proyecto
+## Estructura General del Proyecto
 
 ```text
 src/main/java
@@ -121,157 +121,9 @@ src/main/java
 ├── excepcion
 └── Enums
 ```
-
-### Descripción
-
-* Controller: expone los endpoints REST.
-* Service: contiene la lógica de negocio.
-* Repository: acceso a datos mediante JPA.
-* Model: entidades persistentes.
-* DTO: objetos de transferencia de datos.
-* config: configuración de seguridad y JWT.
-* excepcion: manejo centralizado de errores.
-* Enums: enumeraciones utilizadas por el sistema.
-
 ---
 
-## 7. Descripción de las Entidades Principales
-
-### Usuario
-
-Representa a los usuarios del sistema.
-
-Atributos principales:
-
-* id
-* nombre
-* apellido
-* dni
-* email
-* password
-* activo
-* rol
-
-Roles disponibles:
-
-* ADMIN
-* CHOFER
-
----
-
-### Camion
-
-Representa los vehículos de la flota.
-
-Atributos principales:
-
-* id
-* patente
-* tipo
-* estadoCamion
-* capacidadCarga
-* consumoDieselPorKm
-
----
-
-### Cliente
-
-Representa las empresas o clientes que solicitan servicios.
-
-Atributos principales:
-
-* id
-* cuit
-* razonSocial
-
-Relaciones:
-
-* Un cliente puede poseer múltiples servicios.
-
----
-
-### Ruta
-
-Representa los recorridos de recolección.
-
-Atributos principales:
-
-* idRuta
-* nombre
-* descripcion
-* fecha
-
-Relaciones:
-
-* Un chofer puede estar asignado a una ruta.
-* Una ruta puede contener múltiples servicios.
-
----
-
-### Servicio
-
-Representa un punto de recolección.
-
-Atributos principales:
-
-* id
-* nombre
-* prioridad
-* direccion
-* tipoResiduo
-* frecuencia
-* latitud
-* longitud
-* orden
-
-Relaciones:
-
-* Pertenece a un cliente.
-* Pertenece a una ruta.
-
----
-
-### Tarea
-
-Representa una actividad operativa asignada.
-
-Atributos principales:
-
-* id
-* descripcion
-* fechaEjecucion
-* estado
-
-Relaciones:
-
-* Asociada a un camión.
-* Asociada a una ruta.
-* Asociada a un usuario.
-
----
-
-## 8. Sistema de Autenticación y Autorización
-
-La API utiliza autenticación basada en JWT (JSON Web Token).
-
-### Flujo
-
-1. El usuario envía credenciales.
-2. Spring Security valida los datos.
-3. Se genera un JWT.
-4. El cliente envía el token en cada solicitud.
-
-Cabecera requerida:
-
-```http
-Authorization: Bearer <token>
-```
-
-Los roles del sistema permiten restringir el acceso a determinados recursos.
-
----
-
-## 9. Listado de Endpoints
+## Listado de Endpoints
 
 ### Autenticación
 
@@ -355,7 +207,7 @@ Los roles del sistema permiten restringir el acceso a determinados recursos.
 
 ---
 
-## 10. Ejemplos de Requests y Responses
+## Ejemplos de Requests y Responses
 
 ### Login
 
@@ -408,7 +260,7 @@ Request
 ```json
 {
   "patente": "ABC123",
-  "tipo": "COMPACTADOR",
+  "tipo": "RECOLECTOR",
   "estadoCamion": "DISPONIBLE",
   "capacidadCarga": 12000,
   "consumoDieselPorKm": 0.35
@@ -426,7 +278,7 @@ Response
 
 ---
 
-## 11. Usuarios de Prueba
+## Usuarios de Prueba
 
 En caso de utilizar datos de prueba:
 
@@ -437,7 +289,7 @@ En caso de utilizar datos de prueba:
 
 ---
 
-## 12. Documentación Swagger
+## Documentación Swagger
 
 La API dispone de documentación interactiva mediante Swagger.
 
