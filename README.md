@@ -55,7 +55,7 @@ El objetivo principal es centralizar la gestión de la flota y optimizar la plan
 ### Clonar el repositorio
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/Arianfer/GestionDeCamiones.git
 ```
 
 ### Configurar la Base de Datos
@@ -72,8 +72,8 @@ Completar los siguientes parámetros:
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/gestion_de_camiones?createDatabaseIfNotExist=true
-spring.datasource.username=root
-spring.datasource.password=TU_PASSWORD
+spring.datasource.username= Usuario
+spring.datasource.password= Contraseña
 
 jwt.secret=TU_CLAVE_JWT
 jwt.expiration=86400000
