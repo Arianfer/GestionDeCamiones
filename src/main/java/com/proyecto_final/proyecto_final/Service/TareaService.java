@@ -81,6 +81,22 @@ public class TareaService {
         return tareaToDto(tarea);
     }
 
+    //Tareas Activas por Chofer
+    public List<TareaResponseDTO> obtenerTareasActivasChofer(Long choferId) {
+
+        return tareaRepository
+                .findAllByUsuarioIdAndEstadoIn(
+                        choferId,
+                        List.of(
+                                EstadoTarea.PENDIENTE,
+                                EstadoTarea.EN_CURSO
+                        )
+                )
+                .stream()
+                .map(this::tareaToDto)
+                .toList();
+    }
+
     // Actualizar
     public TareaResponseDTO actualizarEstado(Long id, EstadoTarea nuevoEstado) {
         Tarea tarea = tareaRepository.findById(id)

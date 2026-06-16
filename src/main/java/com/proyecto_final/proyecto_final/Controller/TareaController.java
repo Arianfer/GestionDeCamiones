@@ -45,6 +45,16 @@ public class TareaController {
         return ResponseEntity.ok(tareaService.actualizarEstado(id, nuevoEstado));
     }
 
+    //Endpoint Tareas Activas por Chofer
+    @GetMapping("/mis-tareas/{choferId}")
+    public ResponseEntity<List<TareaResponseDTO>> obtenerTareasActivasChofer(
+            @PathVariable Long choferId) {
+
+        return ResponseEntity.ok(
+                tareaService.obtenerTareasActivasChofer(choferId)
+        );
+    }
+
     // Endpoint estrella: ruta del chofer (app mobile)
     @GetMapping("/mi-ruta/{choferId}")
     public ResponseEntity<RutaResponseDTO> obtenerRutaDeChofer(
