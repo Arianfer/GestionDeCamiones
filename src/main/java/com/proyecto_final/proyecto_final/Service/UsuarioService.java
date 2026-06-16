@@ -1,5 +1,8 @@
 package com.proyecto_final.proyecto_final.Service;
 
+import com.proyecto_final.proyecto_final.DTO.Request.UsuarioRequestDTO;
+import com.proyecto_final.proyecto_final.DTO.Response.UsuarioResponseDTO;
+import com.proyecto_final.proyecto_final.Enums.Rol;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Repository.UsuarioRepository;
 import com.proyecto_final.proyecto_final.Excepcion.UsuarioDesactivadoException;
@@ -14,23 +17,29 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
 
-    public Usuario crearUsuario(Usuario usuario) {
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+    public Usuario crearUsuario(UsuarioRequestDTO dto) {
+        // Validar email duplicado
+        if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Ya existe un usuario con ese email");
         }
-        if (usuarioRepository.existsByDni(usuario.getDni())) {
+        // Validar DNI duplicado
+        if (usuarioRepository.existsByDni(dto.getDni())) {
             throw new RuntimeException("Ya existe un usuario con ese DNI");
         }
-
-        // --- ASIGNACIÓN DE CONTRASEÑA AUTOMÁTICA ---
-        if (usuario.getDni() == null || usuario.getDni().length() < 4) {
-            throw new RuntimeException("El DNI debe tener al menos 4 números para generar la contraseña.");
+        // Validar largo del DNI
+        if (dto.getDni() == null || dto.getDni().length() < 4) {
+            throw new RuntimeException("El DNI debe tener al menos 4 números.");
         }
-        // Le asigna como password los últimos 4 dígitos del DNI ingresado
-        usuario.setPassword(usuario.getDni().substring(usuario.getDni().length() - 4));
 
-        // Lo activamos por defecto al crearlo
-        usuario.setActivo(true);
+        Usuario usuario = Usuario.builder()
+                .nombre(dto.getNombre())
+                .apellido(dto.getApellido())
+                .dni(dto.getDni())
+                .email(dto.getEmail())
+                .password(dto.getDni().substring(dto.getDni().length() - 4)) // ← últimos 4 dígitos del DNI
+                .rol(dto.getRol())
+                .activo(true) // ← activo por defecto
+                .build();
 
         return usuarioRepository.save(usuario);
     }
@@ -49,7 +58,11 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
     }
 
-    // Nuevo método para buscar por DNI
+    public List<Usuario> listarPorRol(Rol rol) {
+        return usuarioRepository.findByRol(rol);
+    }
+
+    // Nuevo metodo para buscar por DNI
     public Usuario buscarPorDni(String dni) {
         return usuarioRepository.findByDni(dni)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con DNI: " + dni));
@@ -70,14 +83,16 @@ public class UsuarioService {
         return usuario;
     }
 
-    public Usuario actualizarUsuario(int id, Usuario datosNuevos) {
+    // Actualizar datos de un usuario existente
+    public Usuario actualizarUsuario(int id, UsuarioRequestDTO dto) {
         Usuario usuarioExistente = buscarPorId(id);
 
-        usuarioExistente.setNombre(datosNuevos.getNombre());
-        usuarioExistente.setApellido(datosNuevos.getApellido());
-        usuarioExistente.setEmail(datosNuevos.getEmail());
-        usuarioExistente.setDni(datosNuevos.getDni());
-        usuarioExistente.setRol(datosNuevos.getRol());
+        // Actualizamos solo los campos que vienen en el DTO
+        usuarioExistente.setNombre(dto.getNombre());
+        usuarioExistente.setApellido(dto.getApellido());
+        usuarioExistente.setEmail(dto.getEmail());
+        usuarioExistente.setDni(dto.getDni());
+        usuarioExistente.setRol(dto.getRol());
 
         return usuarioRepository.save(usuarioExistente);
     }
@@ -87,5 +102,17 @@ public class UsuarioService {
         Usuario usuario = buscarPorId(id);
         usuario.setActivo(false);
         usuarioRepository.save(usuario);
+    }
+
+    public UsuarioResponseDTO toDto(Usuario u) {
+        return UsuarioResponseDTO.builder()
+                .id(u.getId())
+                .nombre(u.getNombre())
+                .apellido(u.getApellido())
+                .dni(u.getDni())
+                .email(u.getEmail())
+                .rol(u.getRol().name())
+                .activo(u.isActivo())
+                .build();
     }
 }

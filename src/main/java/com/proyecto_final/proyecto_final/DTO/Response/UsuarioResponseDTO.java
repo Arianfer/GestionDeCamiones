@@ -1,7 +1,6 @@
 package com.proyecto_final.proyecto_final.DTO.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.proyecto_final.proyecto_final.Enums.Rol;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,9 +16,7 @@ public class UsuarioResponseDTO {
     private String nombre;
     private String apellido;
     private String dni;
-    private String telefono;
     private String email;
-    private Rol rol;
+    private String rol;
     private boolean activo;
-    private String token;
 }

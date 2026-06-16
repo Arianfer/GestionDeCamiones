@@ -367,6 +367,8 @@
         </div>
 
         <div id="vista-usuarios" class="vista-contenido">
+
+            <!-- Formulario de creación -->
             <h3 style="margin-top: 0; color: #333;">Registrar Nuevo Personal</h3>
             <div class="form-group">
                 <label>Nombre:</label>
@@ -387,11 +389,34 @@
             <div class="form-group">
                 <label>Rol en el sistema:</label>
                 <select id="new-rol">
+                    <option value="ADMIN" id="opcion-admin">ADMIN (Administrador)</option>
                     <option value="OFICINA">OFICINA (Administrativo)</option>
                     <option value="EMPLEADO">EMPLEADO (Chofer)</option>
                 </select>
             </div>
             <button class="btn-success" onclick="ejecutarCrearUsuario()">Guardar Usuario</button>
+
+            <!-- Listado de usuarios -->
+            <h3 style="margin-top: 25px; color: #333;">Personal Registrado</h3>
+            <div style="overflow-x: auto;">
+                <table class="tabla-datos">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>DNI</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th style="text-align: center;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabla-usuarios-body">
+                    <tr><td colspan="8" style="text-align: center;">Cargando personal...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="box-mensaje" class="resultado"></div>
@@ -492,6 +517,11 @@
             } else {
                 elementosAdmin.forEach(el => el.style.display = 'none');
             }
+            // Ocultar opcion ADMIN si el usuario es OFICINA
+            if (rol === 'OFICINA') {
+                const opcionAdmin = document.getElementById('opcion-admin');
+                if (opcionAdmin) opcionAdmin.style.display = 'none';
+            }
 
             cambiarPestania('rutas');
         }
@@ -518,6 +548,7 @@
 
         if (pestania === 'rutas') cargarRutas();
         if (pestania === 'clientes') cargarClientes();
+        if (pestania === 'usuarios') cargarUsuarios();
     }
 
     // ==========================================
@@ -786,11 +817,68 @@
                 return response.json();
             })
             .then(data => {
-                mostrarMensaje(`¡Usuario ${data.nombre} creado con éxito! Clave: ${data.dni.slice(-4)}`, 'exito');
+                mostrarMensaje(`¡Usuario ${data.nombre} creado! Clave: ${data.dni.slice(-4)}`, 'exito');
                 document.getElementById('new-nombre').value = '';
                 document.getElementById('new-apellido').value = '';
                 document.getElementById('new-dni').value = '';
                 document.getElementById('new-email').value = '';
+                cargarUsuarios(); // ← recarga la tabla automáticamente
+            })
+            .catch(err => mostrarMensaje(err.message, 'error'));
+    }
+    // Nueva función para cargar usuarios
+    function cargarUsuarios() {
+        const token = localStorage.getItem('token_jwt');
+        const tbody = document.getElementById('tabla-usuarios-body');
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Cargando...</td></tr>';
+
+        fetch(`${API_URL}/usuarios`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No hay personal registrado.</td></tr>';
+                    return;
+                }
+                let filas = '';
+                data.forEach(u => {
+                    const estadoColor = u.activo ? '#28a745' : '#dc3545';
+                    const estadoTexto = u.activo ? 'Activo' : 'Inactivo';
+                    filas += `
+                <tr>
+                    <td><strong>${u.id}</strong></td>
+                    <td>${u.nombre}</td>
+                    <td>${u.apellido}</td>
+                    <td>${u.dni}</td>
+                    <td>${u.email}</td>
+                    <td><strong>${u.rol}</strong></td>
+                    <td><span style="color: ${estadoColor}; font-weight: bold;">${estadoTexto}</span></td>
+                    <td style="text-align: center;">
+                        <button class="btn-icono" title="Desactivar" onclick="desactivarUsuario(${u.id})">🚫</button>
+                    </td>
+                </tr>`;
+                });
+                tbody.innerHTML = filas;
+            })
+            .catch(err => {
+                tbody.innerHTML = `<tr><td colspan="8" class="error">Error: ${err.message}</td></tr>`;
+            });
+    }
+
+    // Desactivar usuario desde la tabla
+    function desactivarUsuario(id) {
+        if (!confirm(`¿Desactivar al usuario #${id}?`)) return;
+        const token = localStorage.getItem('token_jwt');
+
+        fetch(`${API_URL}/usuarios/${id}/desactivar`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('No se pudo desactivar el usuario.');
+                mostrarMensaje('Usuario desactivado correctamente.', 'exito');
+                cargarUsuarios();
             })
             .catch(err => mostrarMensaje(err.message, 'error'));
     }
