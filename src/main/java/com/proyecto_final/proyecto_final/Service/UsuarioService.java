@@ -2,7 +2,7 @@ package com.proyecto_final.proyecto_final.Service;
 
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Repository.UsuarioRepository;
-import com.proyecto_final.proyecto_final.excepcion.UsuarioDesactivadoException;
+import com.proyecto_final.proyecto_final.Excepcion.UsuarioDesactivadoException;
 import lombok.*;
 import org.springframework.stereotype.Service;
 

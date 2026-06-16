@@ -3,7 +3,7 @@ package com.proyecto_final.proyecto_final.Service;
 import com.proyecto_final.proyecto_final.Enums.EstadoCamion;
 import com.proyecto_final.proyecto_final.Model.Camion;
 import com.proyecto_final.proyecto_final.Repository.CamionRepository;
-import com.proyecto_final.proyecto_final.excepcion.PatenteInvalidaException;
+import com.proyecto_final.proyecto_final.Excepcion.PatenteInvalidaException;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
