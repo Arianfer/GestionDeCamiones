@@ -11,10 +11,10 @@ import com.proyecto_final.proyecto_final.Repository.CamionRepository;
 import com.proyecto_final.proyecto_final.Repository.RutaRepository;
 import com.proyecto_final.proyecto_final.Repository.TareaRepository;
 import com.proyecto_final.proyecto_final.Repository.UsuarioRepository;
-import com.proyecto_final.proyecto_final.excepcion.CamionNoDisponibleException;
-import com.proyecto_final.proyecto_final.excepcion.RutaNoHalladaException;
-import com.proyecto_final.proyecto_final.excepcion.TareaNoEncontradaException;
-import com.proyecto_final.proyecto_final.excepcion.UsuarioDesactivadoException;
+import com.proyecto_final.proyecto_final.Excepcion.CamionNoDisponibleException;
+import com.proyecto_final.proyecto_final.Excepcion.RutaNoHalladaException;
+import com.proyecto_final.proyecto_final.Excepcion.TareaNoEncontradaException;
+import com.proyecto_final.proyecto_final.Excepcion.UsuarioDesactivadoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

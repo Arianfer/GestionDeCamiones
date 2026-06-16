@@ -3,7 +3,7 @@ package com.proyecto_final.proyecto_final.Service;
 import com.proyecto_final.proyecto_final.Model.Ruta;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Repository.RutaRepository;
-import com.proyecto_final.proyecto_final.excepcion.RutaNoHalladaException;
+import com.proyecto_final.proyecto_final.Excepcion.RutaNoHalladaException;
 import lombok.*;
 import org.springframework.stereotype.Service;
 

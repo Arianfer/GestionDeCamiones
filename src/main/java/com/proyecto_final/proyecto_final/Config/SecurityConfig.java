@@ -1,4 +1,4 @@
-package com.proyecto_final.proyecto_final.config;
+package com.proyecto_final.proyecto_final.Config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
