@@ -1,5 +1,7 @@
 package com.proyecto_final.proyecto_final.Service;
 
+import com.proyecto_final.proyecto_final.DTO.Request.UsuarioRequestDTO;
+import com.proyecto_final.proyecto_final.DTO.Response.UsuarioResponseDTO;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Repository.UsuarioRepository;
 import com.proyecto_final.proyecto_final.Excepcion.UsuarioDesactivadoException;
@@ -14,33 +16,35 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
 
-    public Usuario crearUsuario(Usuario usuario) {
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+    public UsuarioResponseDTO crearUsuario(UsuarioRequestDTO usuariodto) {
+
+        if (usuarioRepository.existsByEmail(usuariodto.getEmail())) {
             throw new RuntimeException("Ya existe un usuario con ese email");
         }
-        if (usuarioRepository.existsByDni(usuario.getDni())) {
+        if (usuarioRepository.existsByDni(usuariodto.getDni())) {
             throw new RuntimeException("Ya existe un usuario con ese DNI");
         }
 
         // --- ASIGNACIÓN DE CONTRASEÑA AUTOMÁTICA ---
-        if (usuario.getDni() == null || usuario.getDni().length() < 4) {
+        if (usuariodto.getDni() == null || usuariodto.getDni().length() < 4) {
             throw new RuntimeException("El DNI debe tener al menos 4 números para generar la contraseña.");
         }
         // Le asigna como password los últimos 4 dígitos del DNI ingresado
-        usuario.setPassword(usuario.getDni().substring(usuario.getDni().length() - 4));
+        usuariodto.setPassword(usuariodto.getDni().substring(usuariodto.getDni().length() - 4));
 
+        Usuario usuario = mapeartoEntidad(usuariodto);
         // Lo activamos por defecto al crearlo
         usuario.setActivo(true);
 
-        return usuarioRepository.save(usuario);
+        return mapeartoDTO(usuarioRepository.save(usuario));
     }
 
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioResponseDTO> listarUsuarios() {
+        return usuarioRepository.findAll().stream().map(this::mapeartoDTO).toList();
     }
 
     public Usuario buscarPorId(int id) {
-        return usuarioRepository.findById((long) id)
+        return  usuarioRepository.findById((long) id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
     }
 
@@ -70,7 +74,7 @@ public class UsuarioService {
         return usuario;
     }
 
-    public Usuario actualizarUsuario(int id, Usuario datosNuevos) {
+    public UsuarioResponseDTO actualizarUsuario(int id, UsuarioRequestDTO datosNuevos) {
         Usuario usuarioExistente = buscarPorId(id);
 
         usuarioExistente.setNombre(datosNuevos.getNombre());
@@ -79,7 +83,7 @@ public class UsuarioService {
         usuarioExistente.setDni(datosNuevos.getDni());
         usuarioExistente.setRol(datosNuevos.getRol());
 
-        return usuarioRepository.save(usuarioExistente);
+        return mapeartoDTO(usuarioRepository.save(usuarioExistente));
     }
 
     // Desactivar usuario (baja lógica, no elimina de la base de datos)
@@ -87,5 +91,28 @@ public class UsuarioService {
         Usuario usuario = buscarPorId(id);
         usuario.setActivo(false);
         usuarioRepository.save(usuario);
+    }
+
+    public Usuario mapeartoEntidad(UsuarioRequestDTO dto) {
+        return Usuario.builder()
+                .nombre(dto.getNombre())
+                .apellido(dto.getApellido())
+                .dni(dto.getDni())
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .rol(dto.getRol())
+                .build();
+    }
+
+    public UsuarioResponseDTO mapeartoDTO(Usuario usuario) {
+        return UsuarioResponseDTO.builder()
+                .id(usuario.getId())
+                .nombre(usuario.getNombre())
+                .apellido(usuario.getApellido())
+                .dni(usuario.getDni())
+                .email(usuario.getEmail())
+                .rol(usuario.getRol())
+                .activo(usuario.isActivo())
+                .build();
     }
 }
