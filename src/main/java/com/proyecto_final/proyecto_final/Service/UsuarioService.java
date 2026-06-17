@@ -2,6 +2,7 @@ package com.proyecto_final.proyecto_final.Service;
 
 import com.proyecto_final.proyecto_final.DTO.Request.UsuarioRequestDTO;
 import com.proyecto_final.proyecto_final.DTO.Response.UsuarioResponseDTO;
+import com.proyecto_final.proyecto_final.Enums.Rol;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Repository.UsuarioRepository;
 import com.proyecto_final.proyecto_final.Excepcion.UsuarioDesactivadoException;
@@ -16,36 +17,39 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
 
-    public UsuarioResponseDTO crearUsuario(UsuarioRequestDTO usuariodto) {
-
-        if (usuarioRepository.existsByEmail(usuariodto.getEmail())) {
+    public Usuario crearUsuario(UsuarioRequestDTO dto) {
+        // Validar email duplicado
+        if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Ya existe un usuario con ese email");
         }
-        if (usuarioRepository.existsByDni(usuariodto.getDni())) {
+        // Validar DNI duplicado
+        if (usuarioRepository.existsByDni(dto.getDni())) {
             throw new RuntimeException("Ya existe un usuario con ese DNI");
         }
-
-        // --- ASIGNACIÓN DE CONTRASEÑA AUTOMÁTICA ---
-        if (usuariodto.getDni() == null || usuariodto.getDni().length() < 4) {
-            throw new RuntimeException("El DNI debe tener al menos 4 números para generar la contraseña.");
+        // Validar largo del DNI
+        if (dto.getDni() == null || dto.getDni().length() < 4) {
+            throw new RuntimeException("El DNI debe tener al menos 4 números.");
         }
 
-        Usuario usuario = mapeartoEntidad(usuariodto);
+        Usuario usuario = Usuario.builder()
+                .nombre(dto.getNombre())
+                .apellido(dto.getApellido())
+                .dni(dto.getDni())
+                .email(dto.getEmail())
+                .password(dto.getDni().substring(dto.getDni().length() - 4)) // ← últimos 4 dígitos del DNI
+                .rol(dto.getRol())
+                .activo(true) // ← activo por defecto
+                .build();
 
-        // Asignamos como password los últimos 4 dígitos del DNI ingresado
-        usuario.setPassword(usuariodto.getDni().substring(usuariodto.getDni().length() - 4));
-        // Lo activamos por defecto al crearlo
-        usuario.setActivo(true);
-
-        return mapeartoDTO(usuarioRepository.save(usuario));
+        return usuarioRepository.save(usuario);
     }
 
-    public List<UsuarioResponseDTO> listarUsuarios() {
-        return usuarioRepository.findAll().stream().map(this::mapeartoDTO).toList();
+    public List<Usuario> listarUsuarios() {
+        return usuarioRepository.findAll();
     }
 
     public Usuario buscarPorId(int id) {
-        return  usuarioRepository.findById((long) id)
+        return usuarioRepository.findById((long) id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
     }
 
@@ -54,6 +58,11 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
     }
 
+    public List<Usuario> listarPorRol(Rol rol) {
+        return usuarioRepository.findByRol(rol);
+    }
+
+    // Nuevo metodo para buscar por DNI
     public Usuario buscarPorDni(String dni) {
         return usuarioRepository.findByDni(dni)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con DNI: " + dni));
@@ -74,16 +83,18 @@ public class UsuarioService {
         return usuario;
     }
 
-    public UsuarioResponseDTO actualizarUsuario(int id, UsuarioRequestDTO datosNuevos) {
+    // Actualizar datos de un usuario existente
+    public Usuario actualizarUsuario(int id, UsuarioRequestDTO dto) {
         Usuario usuarioExistente = buscarPorId(id);
 
-        usuarioExistente.setNombre(datosNuevos.getNombre());
-        usuarioExistente.setApellido(datosNuevos.getApellido());
-        usuarioExistente.setEmail(datosNuevos.getEmail());
-        usuarioExistente.setDni(datosNuevos.getDni());
-        usuarioExistente.setRol(datosNuevos.getRol());
+        // Actualizamos solo los campos que vienen en el DTO
+        usuarioExistente.setNombre(dto.getNombre());
+        usuarioExistente.setApellido(dto.getApellido());
+        usuarioExistente.setEmail(dto.getEmail());
+        usuarioExistente.setDni(dto.getDni());
+        usuarioExistente.setRol(dto.getRol());
 
-        return mapeartoDTO(usuarioRepository.save(usuarioExistente));
+        return usuarioRepository.save(usuarioExistente);
     }
 
     // Desactivar usuario (baja lógica, no elimina de la base de datos)
@@ -93,26 +104,15 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    // MAPEOS
-    public Usuario mapeartoEntidad(UsuarioRequestDTO dto) {
-        return Usuario.builder()
-                .nombre(dto.getNombre())
-                .apellido(dto.getApellido())
-                .dni(dto.getDni())
-                .email(dto.getEmail())
-                .rol(dto.getRol())
-                .build();
-    }
-
-    public UsuarioResponseDTO mapeartoDTO(Usuario usuario) {
+    public UsuarioResponseDTO toDto(Usuario u) {
         return UsuarioResponseDTO.builder()
-                .id(usuario.getId())
-                .nombre(usuario.getNombre())
-                .apellido(usuario.getApellido())
-                .dni(usuario.getDni())
-                .email(usuario.getEmail())
-                .rol(usuario.getRol())
-                .activo(usuario.isActivo())
+                .id(u.getId())
+                .nombre(u.getNombre())
+                .apellido(u.getApellido())
+                .dni(u.getDni())
+                .email(u.getEmail())
+                .rol(u.getRol().name())
+                .activo(u.isActivo())
                 .build();
     }
 }

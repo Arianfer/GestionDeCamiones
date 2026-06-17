@@ -33,7 +33,7 @@ public class TareaService {
 
     public TareaResponseDTO crearTarea(TareaRequestDTO dto) {
 
-        //Valido que exista camion, ruta y usuario
+        //Reviso que todas las entidades existan
         Camion camion = camionRepository.findById(dto.getIdCamion())
                 .orElseThrow(() -> new CamionNoDisponibleException("Camión no encontrado"));
 
@@ -66,6 +66,7 @@ public class TareaService {
         return tareaToDto(tareaRepository.save(tarea));
     }
 
+    // LISTADO TAREAS
     public List<TareaResponseDTO> listarTareas() {
         return tareaRepository.findAll()
                 .stream()
@@ -73,12 +74,30 @@ public class TareaService {
                 .toList();
     }
 
+    // Tarea por ID
     public TareaResponseDTO obtenerPorId(Long id) {
         Tarea tarea = tareaRepository.findById(id)
                 .orElseThrow(() -> new TareaNoEncontradaException("Tarea no encontrada"));
         return tareaToDto(tarea);
     }
 
+    //Tareas Activas por Chofer
+    public List<TareaResponseDTO> obtenerTareasActivasChofer(Long choferId) {
+
+        return tareaRepository
+                .findAllByUsuarioIdAndEstadoIn(
+                        choferId,
+                        List.of(
+                                EstadoTarea.PENDIENTE,
+                                EstadoTarea.EN_CURSO
+                        )
+                )
+                .stream()
+                .map(this::tareaToDto)
+                .toList();
+    }
+
+    // Actualizar
     public TareaResponseDTO actualizarEstado(Long id, EstadoTarea nuevoEstado) {
         Tarea tarea = tareaRepository.findById(id)
                 .orElseThrow(() -> new TareaNoEncontradaException("Tarea no encontrada"));
@@ -95,6 +114,7 @@ public class TareaService {
         return tareaToDto(tareaRepository.save(tarea));
     }
 
+    // ── Endpoint estrella: ruta del chofer ────────────────────────────────────
     public RutaResponseDTO obtenerRutaDeChofer(Long choferId) {
 
         // Busca la tarea PENDIENTE o EN_CURSO del chofer

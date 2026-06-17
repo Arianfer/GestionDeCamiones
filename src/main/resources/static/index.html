@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ciageser - Control de Operaciones</title>
+    <!-- LIBRERÍA PARA ALERTAS LINDAS (SWEETALERT2) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -43,8 +46,9 @@
         .btn-primary:hover { background-color: #0056b3; }
         .btn-success { background-color: #17a2b8; color: white; margin-bottom: 10px; }
         .btn-success:hover { background-color: #138496; }
+        .btn-danger { background-color: #dc3545; color: white; margin-bottom: 10px; }
+        .btn-danger:hover { background-color: #bd2130; }
 
-        /* NAVBAR MODERNA AJUSTADA */
         .navbar {
             background-color: #1e2229;
             padding: 0 15px;
@@ -56,11 +60,7 @@
             width: 100%;
             box-sizing: border-box;
         }
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .nav-left { display: flex; align-items: center; gap: 5px; }
         .nav-brand { font-size: 13px; font-weight: bold; color: #17a2b8; white-space: nowrap; margin-right: 5px; }
         .nav-menu { display: flex; gap: 0; }
 
@@ -89,7 +89,6 @@
         .exito { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* TABLAS Y LISTADOS */
         .tabla-datos {
             width: 100%; border-collapse: collapse; margin-top: 15px;
             font-size: 14px; text-align: left;
@@ -103,92 +102,61 @@
             padding: 5px; margin: 0 2px; transition: transform 0.2s; width: auto;
         }
         .btn-icono:hover { transform: scale(1.1); }
+        .btn-icono-rojo:hover { transform: scale(1.1); background-color: #dc3545; border-radius: 4px; }
 
         .tarjeta-ruta {
             background: #ffffff; border: 1px solid #e0e0e0;
             border-radius: 6px; padding: 15px; margin-top: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: left;
         }
-        .tarjeta-ruta h4 { margin: 0 0 10px 0; color: #0056b3; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px; }
+        .tarjeta-ruta-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #f0f0f0; padding-bottom: 5px; margin-bottom: 10px;
+        }
+        .tarjeta-ruta-header h4 { margin: 0; color: #0056b3; }
         .tarjeta-ruta p { margin: 5px 0; font-size: 14px; color: #555; }
+
+        .lista-servicios { list-style: none; padding: 0; margin-top: 10px; }
+        .item-servicio {
+            background: #f8f9fa; border-left: 4px solid #28a745;
+            padding: 10px; margin-bottom: 8px; border-radius: 0 4px 4px 0;
+            font-size: 13px; color: #333;
+        }
 
         .vista-contenido { display: none; }
         .vista-activa { display: block; }
 
-        /* ========================================================= */
-        /* ESTILOS EXCLUSIVOS PARA MÓVIL (CHOFERES)                  */
-        /* ========================================================= */
+        /* ESTILOS MÓVIL */
         .container-mobile {
-            display: none; /* Se muestra por JS si es EMPLEADO */
-            flex-direction: column;
-            width: 100%;
-            max-width: 500px;
-            height: 90vh; /* Ajustado para simular app */
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            overflow: hidden;
-            margin-top: 10px;
+            display: none; flex-direction: column; width: 100%; max-width: 500px;
+            height: 90vh; background-color: white; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow: hidden; margin-top: 10px;
         }
-
-        .header-mobile {
-            background-color: #1e2229;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .info-parada {
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #ddd;
-            text-align: center;
-        }
-
-        .mapa-placeholder {
-            flex-grow: 1;
-            background-color: #e9ecef;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #6c757d;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .controles-mobile {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 20px;
-            background-color: white;
-            padding-bottom: 30px;
-        }
-
-        .btn-chofer {
-            width: 75px;
-            height: 75px;
-            border-radius: 15px;
-            border: none;
-            font-size: 35px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            cursor: pointer;
-        }
-
+        .header-mobile { background-color: #1e2229; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .info-parada { padding: 15px; background-color: #f8f9fa; border-bottom: 2px solid #ddd; text-align: center; }
+        .mapa-placeholder { flex-grow: 1; background-color: #e9ecef; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #6c757d; border-bottom: 2px solid #ddd; }
+        .controles-mobile { display: flex; justify-content: space-around; align-items: center; padding: 20px; background-color: white; padding-bottom: 30px; }
+        .btn-chofer { width: 75px; height: 75px; border-radius: 15px; border: none; font-size: 35px; display: flex; justify-content: center; align-items: center; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer; }
         .btn-falla { background-color: #dc3545; }
         .btn-falla:active { background-color: #bd2130; transform: scale(0.95); }
-
         .btn-exito { background-color: #28a745; }
         .btn-exito:active { background-color: #218838; transform: scale(0.95); }
-
         .btn-alerta { background-color: #fd7e14; }
         .btn-alerta:active { background-color: #e8590c; transform: scale(0.95); }
+
+        /* FIX DEFINITIVO PARA QUE SWEETALERT NO SE DESBORDE EN EL CELULAR */
+        .swal2-popup {
+            width: 90% !important; /* Que la alerta no toque los bordes del celular */
+            max-width: 400px !important;
+        }
+        .swal2-select, .swal2-input, .swal2-textarea {
+            min-width: 0 !important; /* SweetAlert a veces fuerza min-widths gigantes */
+            width: 90% !important; /* Que no se salga del cuadrito */
+            max-width: 100% !important;
+            margin: 15px auto !important; /* Centrado perfecto izquierda/derecha */
+            box-sizing: border-box !important;
+            font-size: 15px !important;
+        }
     </style>
 </head>
 <body>
@@ -205,7 +173,6 @@
             <input type="password" id="password" placeholder="Ej: 5678">
         </div>
         <button class="btn-primary" onclick="ejecutarLogin()">Iniciar Sesión</button>
-        <div id="box-login-msg" class="resultado"></div>
     </div>
 </div>
 
@@ -228,6 +195,7 @@
     </div>
 
     <div class="pad-container">
+        <!-- VISTA CLIENTES -->
         <div id="vista-clientes" class="vista-contenido">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0; color: #333;">Directorio de Clientes</h3>
@@ -248,8 +216,8 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="btn-success" style="width: auto; padding: 8px 20px;" onclick="guardarCliente()">Guardar</button>
-                    <button style="width: auto; padding: 8px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="ocultarFormularioCliente()">Cancelar</button>
+                    <button class="btn-success" style="flex: 1; padding: 8px 0;" onclick="guardarCliente()">Guardar</button>
+                    <button class="btn-danger" style="flex: 1; padding: 8px 0;" onclick="ocultarFormularioCliente()">Cancelar</button>
                 </div>
             </div>
 
@@ -270,6 +238,7 @@
             </div>
         </div>
 
+        <!-- VISTA SERVICIOS (UBICACIONES) -->
         <div id="vista-servicios" class="vista-contenido">
             <h3 style="margin-top: 0; color: #333;">Nueva Ubicación de Recolección</h3>
             <div class="form-group">
@@ -294,23 +263,28 @@
             </div>
             <div class="form-group">
                 <label>Frecuencia:</label>
-                <input type="text" id="srv-frecuencia" placeholder="Ej: DIARIA o SEMANAL">
+                <select id="srv-frecuencia">
+                    <option value="TODOS_LOS_DIAS">Todos los días</option>
+                    <option value="LUNES_MIERCOLES_VIERNES">Lunes, Miércoles y Viernes</option>
+                    <option value="MARTES_JUEVES_SABADOS">Martes, Jueves y Sábados</option>
+                </select>
             </div>
             <div class="form-group">
-                <label>Orden en el recorrido:</label>
-                <input type="number" id="srv-orden" placeholder="Ej: 1">
+                <label>Recorrido Perteneciente:</label>
+                <select id="srv-ruta">
+                    <option value="">Cargando recorridos...</option>
+                </select>
             </div>
             <div class="form-group">
-                <label>ID del Recorrido Perteneciente:</label>
-                <input type="number" id="srv-ruta" placeholder="Ej: 1">
-            </div>
-            <div class="form-group">
-                <label>ID del Cliente (Dueño):</label>
-                <input type="number" id="srv-cliente" placeholder="Ej: 2">
+                <label>Cliente (Dueño):</label>
+                <select id="srv-cliente">
+                    <option value="">Cargando clientes...</option>
+                </select>
             </div>
             <button class="btn-success" onclick="ejecutarCrearServicio()">Guardar Ubicación</button>
         </div>
 
+        <!-- VISTA RUTAS (RECORRIDOS) -->
         <div id="vista-rutas" class="vista-contenido vista-activa">
             <div class="admin-element" style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #e0e0e0;">
                 <h4 style="margin-top: 0; color: #333; font-size: 15px;">➕ Registrar Nuevo Recorrido</h4>
@@ -323,9 +297,11 @@
                         <label style="font-size: 12px; color: #555;">Descripción / Zona:</label>
                         <input type="text" id="rec-descripcion" placeholder="Ej: Zona Centro - Mañana" style="padding: 6px; font-size: 13px;">
                     </div>
-                    <div style="flex: 1; min-width: 90px;">
-                        <label style="font-size: 12px; color: #555;">ID Chofer:</label>
-                        <input type="number" id="rec-chofer" placeholder="Opcional" style="padding: 6px; font-size: 13px;">
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="font-size: 12px; color: #555;">Chofer Asignado:</label>
+                        <select id="rec-chofer" style="padding: 6px; font-size: 13px;">
+                            <option value="">Sin asignar (Opcional)</option>
+                        </select>
                     </div>
                 </div>
                 <button class="btn-success" onclick="ejecutarCrearRecorrido()" style="padding: 8px 15px; font-size: 13px; width: auto; margin-top: 5px;">Guardar Recorrido</button>
@@ -337,35 +313,64 @@
             </div>
         </div>
 
+        <!-- VISTA CAMIONES -->
         <div id="vista-camiones" class="vista-contenido">
-            <h3 style="margin-top: 0; color: #333;">Registrar Nuevo Camión</h3>
-            <div class="form-group">
-                <label>Patente / Dominio:</label>
-                <input type="text" id="cam-patente" placeholder="Ej: AF123CD">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: #333;">Flota de Camiones</h3>
+                <button class="btn-success" style="width: auto; margin: 0; padding: 8px 15px; font-size: 13px;" onclick="mostrarFormularioCamion()">➕ Alta Camión</button>
             </div>
-            <div class="form-group">
-                <label>Tipo de Vehículo:</label>
-                <input type="text" id="cam-tipo" placeholder="Ej: RECOLECTOR o DAILY">
+
+            <div id="form-camion-box" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; color: #333;">Registrar Nuevo Camión</h4>
+                <div class="form-group">
+                    <label>Patente / Dominio:</label>
+                    <input type="text" id="cam-patente" placeholder="Ej: AF123CD">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Vehículo:</label>
+                    <select id="cam-tipo">
+                        <option value="RECOLECTOR">Recolector Tradicional</option>
+                        <option value="DAILY">Camión Daily / Chasis</option>
+                        <option value="BARRIOS_PRIVADOS">Barrios Privados</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estado Inicial:</label>
+                    <select id="cam-estado">
+                        <option value="DISPONIBLE">DISPONIBLE</option>
+                        <option value="EN_MANTENIMIENTO">EN MANTENIMIENTO</option>
+                        <option value="FUERA_DE_SERVICIO">FUERA DE SERVICIO</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Capacidad de Carga (kg):</label>
+                    <input type="number" step="0.1" id="cam-capacidad" placeholder="Ej: 15000.0">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn-success" style="flex: 1; padding: 8px 0;" onclick="ejecutarCrearCamion()">Guardar</button>
+                    <button class="btn-danger" style="flex: 1; padding: 8px 0;" onclick="ocultarFormularioCamion()">Cancelar</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Estado Inicial:</label>
-                <select id="cam-estado">
-                    <option value="DISPONIBLE">DISPONIBLE</option>
-                    <option value="EN_MANTENIMIENTO">EN MANTENIMIENTO</option>
-                    <option value="FUERA_DE_SERVICIO">FUERA DE SERVICIO</option>
-                </select>
+
+            <div style="overflow-x: auto;">
+                <table class="tabla-datos">
+                    <thead>
+                    <tr>
+                        <th>Patente</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Capacidad</th>
+                        <th style="text-align: center;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabla-camiones-body">
+                    <tr><td colspan="5" style="text-align: center;">Cargando camiones...</td></tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label>Capacidad de Carga (kg):</label>
-                <input type="number" step="0.1" id="cam-capacidad" placeholder="Ej: 15000.0">
-            </div>
-            <div class="form-group">
-                <label>Consumo Diésel por Km (L):</label>
-                <input type="number" step="0.01" id="cam-consumo" placeholder="Ej: 0.35">
-            </div>
-            <button class="btn-success" onclick="ejecutarCrearCamion()">Guardar Camión</button>
         </div>
 
+        <!-- VISTA USUARIOS (PERSONAL) -->
         <div id="vista-usuarios" class="vista-contenido">
             <h3 style="margin-top: 0; color: #333;">Registrar Nuevo Personal</h3>
             <div class="form-group">
@@ -387,36 +392,54 @@
             <div class="form-group">
                 <label>Rol en el sistema:</label>
                 <select id="new-rol">
+                    <option value="ADMIN" id="opcion-admin">ADMIN (Administrador)</option>
                     <option value="OFICINA">OFICINA (Administrativo)</option>
                     <option value="EMPLEADO">EMPLEADO (Chofer)</option>
                 </select>
             </div>
             <button class="btn-success" onclick="ejecutarCrearUsuario()">Guardar Usuario</button>
+
+            <h3 style="margin-top: 25px; color: #333;">Personal Registrado</h3>
+            <div style="overflow-x: auto;">
+                <table class="tabla-datos">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>DNI</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th style="text-align: center;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabla-usuarios-body">
+                    <tr><td colspan="8" style="text-align: center;">Cargando personal...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div id="box-mensaje" class="resultado"></div>
     </div>
 </div>
 
+<!-- MÓVIL CHOFER -->
 <div class="container-mobile" id="interfaz-movil">
-
     <div class="header-mobile">
         <strong id="chofer-nombre">Chofer: Cargando...</strong>
         <button class="nav-logout" onclick="ejecutarLogout()" style="padding: 6px 12px;">Salir</button>
     </div>
-
     <div class="info-parada">
         <h3 style="margin: 0; color: #0056b3;">Siguiente Punto Asignado</h3>
         <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: bold;">Cargando recorrido...</p>
         <p style="margin: 2px 0 0 0; color: #555;">Esperando datos de la oficina</p>
     </div>
-
     <div class="mapa-placeholder">
         <span style="font-size: 40px;">🗺️</span>
         <p style="margin: 10px 0 0 0; font-weight: bold;">Mapa Interactivo</p>
         <p style="margin: 5px 0 0 0; font-size: 13px;">(Integración con Google Maps pendiente)</p>
     </div>
-
     <div class="controles-mobile">
         <button class="btn-chofer btn-falla" onclick="registrarFalla()" title="Falla / No recolectado">✖</button>
         <button class="btn-chofer btn-exito" onclick="registrarExito()" title="Recolección completada">✔</button>
@@ -427,16 +450,17 @@
 <script>
     const API_URL = 'http://localhost:8080/api';
 
+    // SWEET ALERT WRAPPERS
+    function mostrarExito(mensaje) { Swal.fire({ title: '¡Éxito!', text: mensaje, icon: 'success', confirmButtonColor: '#17a2b8' }); }
+    function mostrarError(mensaje) { Swal.fire({ title: 'Atención', text: mensaje, icon: 'error', confirmButtonColor: '#dc3545' }); }
+
     window.onload = function() {
-        if (localStorage.getItem('token_jwt')) {
-            enrutarPorRol();
-        }
+        if (localStorage.getItem('token_jwt')) { enrutarPorRol(); }
     };
 
     function ejecutarLogin() {
         const dni = document.getElementById('dni').value;
         const password = document.getElementById('password').value;
-        const box = document.getElementById('box-login-msg');
 
         fetch(`${API_URL}/auth/login`, {
             method: 'POST',
@@ -452,37 +476,23 @@
                 localStorage.setItem('user_rol', data.rol);
                 localStorage.setItem('user_nombre', data.nombre);
 
-                box.style.display = 'block';
-                box.className = 'resultado exito';
-                box.innerText = `¡Ingreso exitoso!`;
-
-                setTimeout(() => {
-                    box.style.display = 'none';
-                    enrutarPorRol();
-                }, 800);
+                Swal.fire({
+                    icon: 'success', title: 'Ingreso exitoso', text: 'Cargando el panel...',
+                    timer: 1000, showConfirmButton: false
+                }).then(() => { enrutarPorRol(); });
             })
-            .catch(err => {
-                box.style.display = 'block';
-                box.className = 'resultado error';
-                box.innerText = err.message;
-            });
+            .catch(err => mostrarError(err.message));
     }
 
-    // ==========================================
-    // RUTEADOR PRINCIPAL (Admin vs Chofer)
-    // ==========================================
     function enrutarPorRol() {
         document.getElementById('seccion-login').style.display = 'none';
-
         const rol = localStorage.getItem('user_rol');
         const nombre = localStorage.getItem('user_nombre') || 'Usuario';
 
         if (rol === 'EMPLEADO') {
-            // Activar Vista Móvil
             document.getElementById('interfaz-movil').style.display = 'flex';
             document.getElementById('chofer-nombre').innerText = `🚐 ${nombre}`;
         } else {
-            // Activar Vista Escritorio
             document.getElementById('interfaz-escritorio').style.display = 'block';
             document.getElementById('bienvenida-texto').innerText = `${nombre}`;
 
@@ -492,20 +502,22 @@
             } else {
                 elementosAdmin.forEach(el => el.style.display = 'none');
             }
+            if (rol === 'OFICINA') {
+                const opcionAdmin = document.getElementById('opcion-admin');
+                if (opcionAdmin) opcionAdmin.style.display = 'none';
+            }
 
+            cargarOpcionesDesplegables();
             cambiarPestania('rutas');
         }
     }
 
     function cambiarPestania(pestania) {
-        document.getElementById('box-mensaje').style.display = 'none';
-
         document.getElementById('tab-clientes').classList.remove('active');
         document.getElementById('tab-servicios').classList.remove('active');
         document.getElementById('tab-rutas').classList.remove('active');
         document.getElementById('tab-camiones').classList.remove('active');
         document.getElementById('tab-usuarios').classList.remove('active');
-
         document.getElementById(`tab-${pestania}`).classList.add('active');
 
         document.getElementById('vista-clientes').classList.remove('vista-activa');
@@ -513,29 +525,69 @@
         document.getElementById('vista-rutas').classList.remove('vista-activa');
         document.getElementById('vista-camiones').classList.remove('vista-activa');
         document.getElementById('vista-usuarios').classList.remove('vista-activa');
-
         document.getElementById(`vista-${pestania}`).classList.add('vista-activa');
 
         if (pestania === 'rutas') cargarRutas();
         if (pestania === 'clientes') cargarClientes();
+        if (pestania === 'usuarios') cargarUsuarios();
+        if (pestania === 'camiones') cargarCamiones();
     }
 
     // ==========================================
-    // LÓGICA DE RECORRIDOS
+    // CARGA DINÁMICA DE SELECTS
+    // ==========================================
+    function cargarOpcionesDesplegables() {
+        const token = localStorage.getItem('token_jwt');
+
+        // 1. Choferes
+        fetch(`${API_URL}/usuarios`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(res => res.json())
+            .then(data => {
+                const selectChofer = document.getElementById('rec-chofer');
+                if(!selectChofer || !Array.isArray(data)) return;
+                selectChofer.innerHTML = '<option value="">Sin asignar (Opcional)</option>';
+                data.filter(u => u.rol === 'EMPLEADO' && u.activo).forEach(c => {
+                    selectChofer.innerHTML += `<option value="${c.id}">${c.nombre} ${c.apellido}</option>`;
+                });
+            }).catch(e => console.log('Silenciando error:', e));
+
+        // 2. Rutas
+        fetch(`${API_URL}/rutas`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(res => res.json())
+            .then(data => {
+                const selectRuta = document.getElementById('srv-ruta');
+                if(!selectRuta || !Array.isArray(data)) return;
+                selectRuta.innerHTML = '<option value="">Seleccione un recorrido...</option>';
+                data.forEach(r => {
+                    selectRuta.innerHTML += `<option value="${r.idRuta || r.id}">${r.nombre} - ${r.descripcion}</option>`;
+                });
+            }).catch(e => console.log('Silenciando error:', e));
+
+        // 3. Clientes
+        fetch(`${API_URL}/clientes`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(res => res.json())
+            .then(data => {
+                const selectCliente = document.getElementById('srv-cliente');
+                if(!selectCliente || !Array.isArray(data)) return;
+                selectCliente.innerHTML = '<option value="">Seleccione un cliente...</option>';
+                data.forEach(c => {
+                    selectCliente.innerHTML += `<option value="${c.id}">${c.razonSocial} (CUIT: ${c.cuit})</option>`;
+                });
+            }).catch(e => console.log('Silenciando error:', e));
+    }
+
+    // ==========================================
+    // RUTAS
     // ==========================================
     function cargarRutas() {
         const token = localStorage.getItem('token_jwt');
         const boxRutas = document.getElementById('box-rutas');
         boxRutas.innerHTML = '<p style="text-align: center; color: #666;">Cargando recorridos...</p>';
 
-        fetch(`${API_URL}/rutas`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-            .then(response => {
-                if (response.status === 403) throw new Error('Sin permisos.');
-                return response.json();
-            })
+        fetch(`${API_URL}/rutas`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(response => { if (!response.ok) throw new Error('Sin permisos.'); return response.json(); })
             .then(data => {
+                if (!Array.isArray(data)) throw new Error('Formato de datos incorrecto');
                 if (data.length === 0) {
                     boxRutas.innerHTML = `<p style="color: #666;">No hay recorridos registrados.</p>`;
                     return;
@@ -543,12 +595,31 @@
                 let html = '';
                 data.forEach(ruta => {
                     html += `
-                <div class="tarjeta-ruta">
-                    <h4>🚚 Recorrido: ${ruta.nombre}</h4>
-                    <p><strong>Detalle:</strong> ${ruta.descripcion}</p>
-                    <p><strong>Fecha:</strong> ${ruta.fecha || 'Sin fecha'}</p>
-                    <p><strong>Chofer Asignado:</strong> ${ruta.nombreChofer || '<span style="color:red">Sin asignar</span>'}</p>
-                </div>`;
+                    <div class="tarjeta-ruta">
+                        <div class="tarjeta-ruta-header">
+                            <h4>🚚 Recorrido: ${ruta.nombre}</h4>
+                            <button class="btn-icono btn-icono-rojo" title="Eliminar Recorrido" onclick="eliminarRuta(${ruta.idRuta || ruta.id})">🗑️</button>
+                        </div>
+                        <p><strong>Detalle:</strong> ${ruta.descripcion}</p>
+                        <p><strong>Fecha:</strong> ${ruta.fecha || 'Sin fecha'}</p>
+                        <p><strong>Chofer Asignado:</strong> ${ruta.nombreChofer || '<span style="color:red">Sin asignar</span>'}</p>
+                        <h5 style="margin: 15px 0 5px 0; color: #333;">📍 Puntos de Recolección (Paradas):</h5>`;
+
+                    if (ruta.servicios && ruta.servicios.length > 0) {
+                        html += `<ul class="lista-servicios">`;
+                        ruta.servicios.forEach(srv => {
+                            html += `
+                            <li class="item-servicio">
+                                <strong>${srv.orden || '-'}. ${srv.nombre}</strong>
+                                🗺️ Dirección: ${srv.direccion} <br>
+                                🗑️ Residuo: ${srv.tipoResiduo} | ⚡ Prioridad: ${srv.prioridad}
+                            </li>`;
+                        });
+                        html += `</ul>`;
+                    } else {
+                        html += `<p style="color: #d9534f; font-style: italic; font-size: 13px;">No hay paradas asignadas todavía.</p>`;
+                    }
+                    html += `</div>`;
                 });
                 boxRutas.innerHTML = html;
             })
@@ -561,10 +632,7 @@
         const descripcion = document.getElementById('rec-descripcion').value;
         const idChofer = document.getElementById('rec-chofer').value;
 
-        if (!nombre || !descripcion) {
-            mostrarMensaje('El código y descripción son obligatorios.', 'error');
-            return;
-        }
+        if (!nombre || !descripcion) { mostrarError('El código y descripción son obligatorios.'); return; }
 
         const bodyData = { nombre, descripcion };
         if (idChofer) bodyData.idChofer = parseInt(idChofer);
@@ -574,51 +642,65 @@
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(bodyData)
         })
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error('Error al crear el recorrido'); return r.json(); })
             .then(data => {
-                mostrarMensaje(`¡Recorrido "${data.nombre}" registrado!`, 'exito');
+                mostrarExito(`¡Recorrido "${data.nombre}" registrado!`);
                 document.getElementById('rec-nombre').value = '';
                 document.getElementById('rec-descripcion').value = '';
                 document.getElementById('rec-chofer').value = '';
                 cargarRutas();
-            });
+                cargarOpcionesDesplegables();
+            }).catch(err => mostrarError(err.message));
+    }
+
+    function eliminarRuta(id) {
+        Swal.fire({
+            title: '¿Eliminar recorrido?', text: "Se borrará permanentemente", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const token = localStorage.getItem('token_jwt');
+                fetch(`${API_URL}/rutas/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+                    .then(res => {
+                        if (!res.ok) throw new Error('No se pudo eliminar (puede tener ubicaciones vinculadas).');
+                        mostrarExito('Recorrido eliminado exitosamente.');
+                        cargarRutas();
+                        cargarOpcionesDesplegables();
+                    }).catch(err => mostrarError(err.message));
+            }
+        });
     }
 
     // ==========================================
-    // LÓGICA DE CLIENTES (LISTADO, CREAR, EDITAR, BORRAR)
+    // CLIENTES
     // ==========================================
     function cargarClientes() {
         const token = localStorage.getItem('token_jwt');
         const tbody = document.getElementById('tabla-clientes-body');
         tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Cargando clientes...</td></tr>';
 
-        fetch(`${API_URL}/clientes`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
+        fetch(`${API_URL}/clientes`, { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => {
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay clientes registrados.</td></tr>';
-                    return;
-                }
+                if (!Array.isArray(data)) throw new Error('Formato inválido');
+                if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay clientes registrados.</td></tr>'; return; }
                 let filas = '';
                 data.forEach(cli => {
                     filas += `
-                <tr>
-                    <td><strong>${cli.id}</strong></td>
-                    <td>${cli.razonSocial}</td>
-                    <td>${cli.cuit}</td>
-                    <td style="text-align: center;">
-                        <button class="btn-icono" title="Editar" onclick="prepararEdicionCliente(${cli.id}, '${cli.razonSocial}', '${cli.cuit}')">✏️</button>
-                        <button class="btn-icono" title="Eliminar" onclick="eliminarCliente(${cli.id})">🗑️</button>
-                    </td>
-                </tr>`;
+                    <tr>
+                        <td><strong>${cli.id}</strong></td>
+                        <td>${cli.razonSocial}</td>
+                        <td>${cli.cuit}</td>
+                        <td style="text-align: center;">
+                            <button class="btn-icono" title="Editar" onclick="prepararEdicionCliente(${cli.id}, '${cli.razonSocial}', '${cli.cuit}')">✏️</button>
+                            <button class="btn-icono btn-icono-rojo" title="Eliminar" onclick="eliminarCliente(${cli.id})">🗑️</button>
+                        </td>
+                    </tr>`;
                 });
                 tbody.innerHTML = filas;
             })
-            .catch(err => {
-                tbody.innerHTML = `<tr><td colspan="4" class="error">Error al cargar: ${err.message}</td></tr>`;
-            });
+            .catch(err => { tbody.innerHTML = `<tr><td colspan="4" class="error">Error: ${err.message}</td></tr>`; });
     }
 
     function mostrarFormularioCliente() {
@@ -629,10 +711,7 @@
         document.getElementById('cli-cuit').value = '';
     }
 
-    function ocultarFormularioCliente() {
-        document.getElementById('form-cliente-box').style.display = 'none';
-        document.getElementById('box-mensaje').style.display = 'none';
-    }
+    function ocultarFormularioCliente() { document.getElementById('form-cliente-box').style.display = 'none'; }
 
     function prepararEdicionCliente(id, razon, cuit) {
         document.getElementById('form-cliente-box').style.display = 'block';
@@ -649,10 +728,7 @@
         const razonSocial = document.getElementById('cli-razon').value;
         const cuit = document.getElementById('cli-cuit').value;
 
-        if (!razonSocial || !cuit) {
-            mostrarMensaje('Razón social y CUIT son obligatorios.', 'error');
-            return;
-        }
+        if (!razonSocial || !cuit) { mostrarError('Razón social y CUIT son obligatorios.'); return; }
 
         const metodo = id ? 'PUT' : 'POST';
         const url = id ? `${API_URL}/clientes/${id}` : `${API_URL}/clientes`;
@@ -662,85 +738,81 @@
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ razonSocial, cuit })
         })
-            .then(res => {
-                if (!res.ok) throw new Error('Error al guardar el cliente.');
-                return res.json();
-            })
+            .then(res => { if (!res.ok) throw new Error('Error al guardar.'); return res.json(); })
             .then(() => {
-                mostrarMensaje(id ? 'Cliente actualizado.' : 'Cliente registrado exitosamente.', 'exito');
+                mostrarExito(id ? 'Cliente actualizado.' : 'Cliente registrado exitosamente.');
                 ocultarFormularioCliente();
                 cargarClientes();
+                cargarOpcionesDesplegables();
             })
-            .catch(err => mostrarMensaje(err.message, 'error'));
+            .catch(err => mostrarError(err.message));
     }
 
     function eliminarCliente(id) {
-        if (!confirm(`¿Estás seguro de eliminar el cliente #${id}?`)) return;
-
-        const token = localStorage.getItem('token_jwt');
-        fetch(`${API_URL}/clientes/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('No se pudo eliminar (puede tener ubicaciones asignadas).');
-                mostrarMensaje('Cliente eliminado.', 'exito');
-                cargarClientes();
-            })
-            .catch(err => mostrarMensaje(err.message, 'error'));
+        Swal.fire({
+            title: '¿Eliminar cliente?', text: "Se borrará permanentemente", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const token = localStorage.getItem('token_jwt');
+                fetch(`${API_URL}/clientes/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+                    .then(res => {
+                        if (!res.ok) throw new Error('No se pudo eliminar (puede tener ubicaciones asignadas).');
+                        mostrarExito('Cliente eliminado.');
+                        cargarClientes();
+                        cargarOpcionesDesplegables();
+                    }).catch(err => mostrarError(err.message));
+            }
+        });
     }
 
     // ==========================================
-    // LÓGICA DE UBICACIONES / CAMIONES / USUARIOS
+    // CAMIONES
     // ==========================================
-    function ejecutarCrearServicio() {
+    function cargarCamiones() {
         const token = localStorage.getItem('token_jwt');
-        const nombre = document.getElementById('srv-nombre').value;
-        const direccion = document.getElementById('srv-direccion').value;
-        const prioridad = document.getElementById('srv-prioridad').value;
-        const tipoResiduo = document.getElementById('srv-residuo').value;
-        const frecuencia = document.getElementById('srv-frecuencia').value;
-        const orden = document.getElementById('srv-orden').value;
-        const idRuta = document.getElementById('srv-ruta').value;
-        const idCliente = document.getElementById('srv-cliente').value;
+        const tbody = document.getElementById('tabla-camiones-body');
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Cargando camiones...</td></tr>';
 
-        if (!nombre || !direccion || !idRuta || !idCliente) {
-            mostrarMensaje('Nombre, Dirección, ID Recorrido e ID Cliente son obligatorios.', 'error');
-            return;
-        }
-
-        fetch(`${API_URL}/servicios`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ nombre, direccion, prioridad, tipoResiduo, frecuencia, orden, idRuta, idCliente })
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Error al vincular la ubicación. Verifica los IDs provistos.');
-                return response.json();
-            })
+        fetch(`${API_URL}/camiones`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(res => res.json())
             .then(data => {
-                mostrarMensaje(`¡Ubicación "${data.nombre}" guardada y vinculada al recorrido correctamente!`, 'exito');
-                document.getElementById('srv-nombre').value = '';
-                document.getElementById('srv-direccion').value = '';
-                document.getElementById('srv-residuo').value = '';
-                document.getElementById('srv-frecuencia').value = '';
-                document.getElementById('srv-orden').value = '';
-                document.getElementById('srv-ruta').value = '';
-                document.getElementById('srv-cliente').value = '';
+                if (!Array.isArray(data)) throw new Error('Formato inválido de camiones');
+                if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay camiones registrados.</td></tr>'; return; }
+                let filas = '';
+                data.forEach(cam => {
+                    let colorEstado = cam.estadoCamion === 'DISPONIBLE' ? '#28a745' : (cam.estadoCamion === 'EN_MANTENIMIENTO' ? '#ffc107' : '#dc3545');
+                    filas += `
+                <tr>
+                    <td><strong>${cam.patente}</strong></td>
+                    <td>${cam.tipo}</td>
+                    <td><span style="color: ${colorEstado}; font-weight: bold;">${cam.estadoCamion.replace('_', ' ')}</span></td>
+                    <td>${cam.capacidadCarga} kg</td>
+                    <td style="text-align: center;">
+                       <button class="btn-icono btn-icono-rojo" title="Eliminar" onclick="eliminarCamion(${cam.id})">🗑️</button>
+                    </td>
+                </tr>`;
+                });
+                tbody.innerHTML = filas;
             })
-            .catch(err => mostrarMensaje(err.message, 'error'));
+            .catch(err => { tbody.innerHTML = `<tr><td colspan="5" class="error">Error: ${err.message}</td></tr>`; });
     }
+
+    function mostrarFormularioCamion() { document.getElementById('form-camion-box').style.display = 'block'; }
+    function ocultarFormularioCamion() { document.getElementById('form-camion-box').style.display = 'none'; }
 
     function ejecutarCrearCamion() {
         const token = localStorage.getItem('token_jwt');
         const patente = document.getElementById('cam-patente').value;
         const tipo = document.getElementById('cam-tipo').value;
         const estadoCamion = document.getElementById('cam-estado').value;
-        const capacidadCarga = document.getElementById('cam-capacidad').value;
-        const consumoDieselPorKm = document.getElementById('cam-consumo').value;
 
-        if (!patente || !tipo || !capacidadCarga || !consumoDieselPorKm) {
-            mostrarMensaje('Por favor, completa todos los campos del camión.', 'error');
+        const capacidadCarga = parseFloat(document.getElementById('cam-capacidad').value);
+        const consumoDieselPorKm = 0.0;
+
+        if (!patente || !tipo || !capacidadCarga) {
+            mostrarError('Completa todos los campos del camión.');
             return;
         }
 
@@ -750,17 +822,101 @@
             body: JSON.stringify({ patente, tipo, estadoCamion, capacidadCarga, consumoDieselPorKm })
         })
             .then(response => {
-                if (!response.ok) throw new Error('Error al registrar el camión en la API.');
+                if (!response.ok) throw new Error('Error al registrar camión. Revisá la consola.');
                 return response.json();
             })
             .then(data => {
-                mostrarMensaje(`¡Camión [${data.patente || patente}] guardado con éxito en el sistema!`, 'exito');
+                mostrarExito(`¡Camión ${data.patente || patente} guardado!`);
                 document.getElementById('cam-patente').value = '';
-                document.getElementById('cam-tipo').value = '';
+                document.getElementById('cam-tipo').selectedIndex = 0;
                 document.getElementById('cam-capacidad').value = '';
-                document.getElementById('cam-consumo').value = '';
+                ocultarFormularioCamion();
+                cargarCamiones();
             })
-            .catch(err => mostrarMensaje(err.message, 'error'));
+            .catch(err => mostrarError(err.message));
+    }
+
+    function eliminarCamion(patente) {
+        Swal.fire({
+            title: `¿Eliminar camión ${patente}?`, icon: 'warning', showCancelButton: true,
+            confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d', confirmButtonText: 'Sí, eliminar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const token = localStorage.getItem('token_jwt');
+                fetch(`${API_URL}/camiones/${patente}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+                    .then(res => {
+                        if (!res.ok) throw new Error('No se pudo eliminar el camión.');
+                        mostrarExito('Camión eliminado.');
+                        cargarCamiones();
+                    }).catch(err => mostrarError(err.message));
+            }
+        });
+    }
+
+    // ==========================================
+    // UBICACIONES
+    // ==========================================
+    function ejecutarCrearServicio() {
+        const token = localStorage.getItem('token_jwt');
+        const nombre = document.getElementById('srv-nombre').value;
+        const direccion = document.getElementById('srv-direccion').value;
+        const prioridad = document.getElementById('srv-prioridad').value;
+        const tipoResiduo = document.getElementById('srv-residuo').value;
+        const frecuencia = document.getElementById('srv-frecuencia').value;
+        const idRuta = document.getElementById('srv-ruta').value;
+        const idCliente = document.getElementById('srv-cliente').value;
+
+        if (!nombre || !direccion || !idRuta || !idCliente) { mostrarError('Nombre, Dirección, Recorrido y Cliente son obligatorios.'); return; }
+
+        fetch(`${API_URL}/servicios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ nombre, direccion, prioridad, tipoResiduo, frecuencia, orden: 1, idRuta, idCliente })
+        })
+            .then(response => { if (!response.ok) throw new Error('Error al vincular la ubicación. Verifica los IDs provistos.'); return response.json(); })
+            .then(data => {
+                mostrarExito(`¡Ubicación guardada y vinculada!`);
+                document.getElementById('srv-nombre').value = '';
+                document.getElementById('srv-direccion').value = '';
+                document.getElementById('srv-residuo').value = '';
+            })
+            .catch(err => mostrarError(err.message));
+    }
+
+    // ==========================================
+    // USUARIOS
+    // ==========================================
+    function cargarUsuarios() {
+        const token = localStorage.getItem('token_jwt');
+        const tbody = document.getElementById('tabla-usuarios-body');
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Cargando...</td></tr>';
+
+        fetch(`${API_URL}/usuarios`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(res => res.json())
+            .then(data => {
+                if (!Array.isArray(data)) throw new Error('Formato inválido');
+                if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No hay personal.</td></tr>'; return; }
+                let filas = '';
+                data.forEach(u => {
+                    const estadoColor = u.activo ? '#28a745' : '#dc3545';
+                    const estadoTexto = u.activo ? 'Activo' : 'Inactivo';
+                    filas += `
+                    <tr>
+                        <td><strong>${u.id}</strong></td>
+                        <td>${u.nombre}</td>
+                        <td>${u.apellido}</td>
+                        <td>${u.dni}</td>
+                        <td>${u.email}</td>
+                        <td><strong>${u.rol}</strong></td>
+                        <td><span style="color: ${estadoColor}; font-weight: bold;">${estadoTexto}</span></td>
+                        <td style="text-align: center;">
+                            <button class="btn-icono btn-icono-rojo" title="Desactivar" onclick="desactivarUsuario(${u.id})">🚫</button>
+                        </td>
+                    </tr>`;
+                });
+                tbody.innerHTML = filas;
+            })
+            .catch(err => { tbody.innerHTML = `<tr><td colspan="8" class="error">Error: ${err.message}</td></tr>`; });
     }
 
     function ejecutarCrearUsuario() {
@@ -771,66 +927,99 @@
         const email = document.getElementById('new-email').value;
         const rol = document.getElementById('new-rol').value;
 
-        if (!nombre || !apellido || !dni || !email) {
-            mostrarMensaje('Completá todos los campos.', 'error');
-            return;
-        }
+        if (!nombre || !apellido || !dni || !email) { mostrarError('Completá todos los campos.'); return; }
 
         fetch(`${API_URL}/usuarios`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ nombre, apellido, dni, email, rol })
         })
-            .then(response => {
-                if (!response.ok) throw new Error('Error al guardar el personal.');
-                return response.json();
-            })
+            .then(response => { if (!response.ok) throw new Error('Error al guardar personal.'); return response.json(); })
             .then(data => {
-                mostrarMensaje(`¡Usuario ${data.nombre} creado con éxito! Clave: ${data.dni.slice(-4)}`, 'exito');
+                mostrarExito(`Usuario ${data.nombre} creado. Clave: ${data.dni.slice(-4)}`);
                 document.getElementById('new-nombre').value = '';
                 document.getElementById('new-apellido').value = '';
                 document.getElementById('new-dni').value = '';
                 document.getElementById('new-email').value = '';
+                cargarUsuarios();
+                cargarOpcionesDesplegables();
             })
-            .catch(err => mostrarMensaje(err.message, 'error'));
+            .catch(err => mostrarError(err.message));
+    }
+
+    function desactivarUsuario(id) {
+        Swal.fire({
+            title: '¿Desactivar usuario?', text: "No podrá iniciar sesión", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, desactivar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const token = localStorage.getItem('token_jwt');
+                fetch(`${API_URL}/usuarios/${id}/desactivar`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } })
+                    .then(res => {
+                        if (!res.ok) throw new Error('No se pudo desactivar el usuario.');
+                        mostrarExito('Usuario desactivado correctamente.');
+                        cargarUsuarios();
+                        cargarOpcionesDesplegables();
+                    }).catch(err => mostrarError(err.message));
+            }
+        });
     }
 
     // ==========================================
-    // LÓGICA DE LA BOTONERA MÓVIL DEL CHOFER
+    // MÓVIL CHOFER
     // ==========================================
-    function registrarExito() {
-        const horaActual = new Date().toLocaleTimeString();
-        alert(`✅ Registrado con éxito a las ${horaActual}. Guardando en base de datos...`);
-    }
+    function registrarExito() { Swal.fire('✅ Registrado', `Recolección completada a las ${new Date().toLocaleTimeString()}`, 'success'); }
 
     function registrarFalla() {
-        let motivo = prompt("Motivo de la falla:\n1. Candado Propio\n2. Lleno de Escombros\n3. Hongos rotos\n4. Vehículo obstruyendo\n\n(Escribí el motivo o número):");
-        if(motivo) {
-            alert(`❌ Falla registrada por: "${motivo}". Se notificó a la oficina.`);
-        }
+        Swal.fire({
+            title: 'Motivo de Falla',
+            input: 'select',
+            inputOptions: {
+                'Candado Propio': 'Candado Propio',
+                'Lleno de Escombros': 'Lleno de Escombros',
+                'Hongos rotos': 'Hongos rotos',
+                'Vehículo obstruyendo': 'Vehículo obstruyendo',
+                'Otros': 'Otros (Especificar)'
+            },
+            inputPlaceholder: 'Seleccioná un motivo',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Siguiente',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (result.value === 'Otros') {
+                    Swal.fire({
+                        title: 'Especificar Motivo',
+                        input: 'text',
+                        inputPlaceholder: 'Escribí el motivo acá...',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Reportar',
+                        cancelButtonText: 'Cancelar',
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return '¡Necesitás escribir un motivo!'
+                            }
+                        }
+                    }).then((textResult) => {
+                        if (textResult.isConfirmed) {
+                            Swal.fire('❌ Reportado', `Oficina notificada: ${textResult.value}`, 'error');
+                        }
+                    });
+                } else if (result.value) {
+                    Swal.fire('❌ Reportado', `Oficina notificada: ${result.value}`, 'error');
+                }
+            }
+        });
     }
 
-    function registrarIncidencia() {
-        let novedad = prompt("Describe la novedad o incidencia menor:\nEj: Contenedor perdiendo líquido, basura extra, etc.");
-        if(novedad) {
-            alert(`❗ Novedad registrada: "${novedad}". Tarea completada con advertencia.`);
-        }
-    }
+    function registrarIncidencia() { Swal.fire({ title: 'Reportar Novedad', input: 'text', inputPlaceholder: 'Ej: Contenedor roto', showCancelButton: true }).then((r) => { if(r.isConfirmed) Swal.fire('❗ Novedad Guardada', `${r.value}`, 'warning'); }); }
 
-    // ==========================================
-    // UTILERÍA
-    // ==========================================
-    function mostrarMensaje(texto, tipo) {
-        const box = document.getElementById('box-mensaje');
-        box.style.display = 'block';
-        box.className = `resultado ${tipo}`;
-        box.innerHTML = texto;
-    }
-
-    function ejecutarLogout() {
-        localStorage.clear();
-        location.reload();
-    }
+    function ejecutarLogout() { localStorage.clear(); location.reload(); }
 </script>
 
 </body>

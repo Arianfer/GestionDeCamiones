@@ -12,4 +12,9 @@ import java.util.Optional;
 public interface TareaRepository extends JpaRepository<Tarea, Long> {
     // Para buscar la tarea que tiene asignada el chofer actualmente
     Optional<Tarea> findByUsuarioIdAndEstadoIn(Long usuarioId, List<EstadoTarea> estados);
+
+    List<Tarea> findAllByUsuarioIdAndEstadoIn(
+            Long usuarioId,
+            List<EstadoTarea> estados
+    );
 }
