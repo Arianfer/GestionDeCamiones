@@ -6,6 +6,7 @@ import com.proyecto_final.proyecto_final.DTO.Response.ServicioResponseDTO;
 import com.proyecto_final.proyecto_final.Model.Ruta;
 import com.proyecto_final.proyecto_final.Model.Usuario;
 import com.proyecto_final.proyecto_final.Service.RutaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class RutaController {
     }
 
     @PostMapping
-    public RutaResponseDTO crearRuta(@RequestBody RutaRequestDTO rutaDTO){
+    public RutaResponseDTO crearRuta(@Valid @RequestBody RutaRequestDTO rutaDTO){
         // Transformamos el JSON de entrada en un objeto de Java
         Ruta rutaCruda = mapearEntidad(rutaDTO);
         // Lo mandamos al Service (que ahora le pone la fecha si falta y busca al chofer)
@@ -47,7 +48,7 @@ public class RutaController {
     }
 
     @PutMapping("/{id}")
-    public RutaResponseDTO actualizarRuta(@PathVariable Long id, @RequestBody RutaRequestDTO rutaDTO){
+    public RutaResponseDTO actualizarRuta(@PathVariable Long id, @Valid @RequestBody RutaRequestDTO rutaDTO){
         Ruta rutaCruda = mapearEntidad(rutaDTO);
         Ruta rutaActualizada = rutaService.actualizarRuta(id, rutaCruda);
         return convertirADto(rutaActualizada);
