@@ -6,6 +6,7 @@ import com.proyecto_final.proyecto_final.DTO.Response.RutaResponseDTO;
 import com.proyecto_final.proyecto_final.DTO.Response.TareaResponseDTO;
 import com.proyecto_final.proyecto_final.Enums.EstadoTarea;
 import com.proyecto_final.proyecto_final.Service.TareaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class TareaController {
     }
 
     @PostMapping
-    public ResponseEntity<TareaResponseDTO> crearTarea(@RequestBody TareaRequestDTO dto) {
+    public ResponseEntity<TareaResponseDTO> crearTarea(@Valid @RequestBody TareaRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(tareaService.crearTarea(dto));
     }
 
