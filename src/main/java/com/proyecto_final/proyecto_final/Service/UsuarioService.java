@@ -29,10 +29,11 @@ public class UsuarioService {
         if (usuariodto.getDni() == null || usuariodto.getDni().length() < 4) {
             throw new RuntimeException("El DNI debe tener al menos 4 números para generar la contraseña.");
         }
-        // Le asigna como password los últimos 4 dígitos del DNI ingresado
-        usuariodto.setPassword(usuariodto.getDni().substring(usuariodto.getDni().length() - 4));
 
         Usuario usuario = mapeartoEntidad(usuariodto);
+
+        // Asignamos como password los últimos 4 dígitos del DNI ingresado
+        usuario.setPassword(usuariodto.getDni().substring(usuariodto.getDni().length() - 4));
         // Lo activamos por defecto al crearlo
         usuario.setActivo(true);
 
@@ -99,7 +100,6 @@ public class UsuarioService {
                 .apellido(dto.getApellido())
                 .dni(dto.getDni())
                 .email(dto.getEmail())
-                .password(dto.getPassword())
                 .rol(dto.getRol())
                 .build();
     }

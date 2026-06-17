@@ -29,10 +29,6 @@ public class UsuarioRequestDTO {
     @Email(message = "El formato del email es inválido")
     private String email;
 
-    @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 4, max = 8, message = "La contraseña debe tener entre 4 y 8 caracteres")
-    private String password;
-
     @NotNull(message = "Debe especificar un rol")
     private Rol rol;
 }
