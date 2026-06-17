@@ -5,6 +5,7 @@ import com.proyecto_final.proyecto_final.DTO.Request.UsuarioRequestDTO;
 import com.proyecto_final.proyecto_final.DTO.Response.UsuarioResponseDTO;
 import com.proyecto_final.proyecto_final.Enums.Rol;
 import com.proyecto_final.proyecto_final.Service.UsuarioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,7 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    // Listar todos los usuarios del sistema
-    // OFICINA solo ve choferes, ADMIN ve todos
+    // Listar todos los usuarios del sistema (OFICINA solo ve choferes, ADMIN ve todos)
     @GetMapping
     public List<UsuarioResponseDTO> listar(Authentication authentication) {
         String rol = authentication.getAuthorities().iterator().next().getAuthority();
@@ -26,38 +26,36 @@ public class UsuarioController {
         if (rol.equals("ROLE_OFICINA")) {
             // Solo devuelve choferes
             return usuarioService.listarPorRol(Rol.EMPLEADO).stream()
-                    .map(usuarioService::toDto)
+                    .map(usuarioService::mapearToDto)
                     .toList();
         }
         // ADMIN ve todos
-        return usuarioService.listarUsuarios().stream()
-                .map(usuarioService::toDto)
-                .toList();
+        return usuarioService.listarUsuarios();
     }
 
     // Buscar usuario por ID
     @GetMapping("/{id}")
     public UsuarioResponseDTO obtenerPorId(@PathVariable int id) {
-        return usuarioService.toDto(usuarioService.buscarPorId(id));
+        return usuarioService.mapearToDto(usuarioService.buscarPorId(id));
     }
 
     // Buscar usuario por DNI
     @GetMapping("/dni/{dni}")
     public UsuarioResponseDTO buscarPorDni(@PathVariable String dni) {
-        return usuarioService.toDto(usuarioService.buscarPorDni(dni));
+        return usuarioService.mapearToDto(usuarioService.buscarPorDni(dni));
     }
 
     // Crear nuevo usuario - la password se genera automáticamente con los últimos 4 dígitos del DNI
     @PostMapping
-    public UsuarioResponseDTO crearUsuario(@RequestBody UsuarioRequestDTO dto) {
-        return usuarioService.toDto(usuarioService.crearUsuario(dto));
+    public UsuarioResponseDTO crearUsuario(@Valid @RequestBody UsuarioRequestDTO dto) {
+        return usuarioService.mapearToDto(usuarioService.crearUsuario(dto));
     }
 
     // Modificar datos de un usuario existente
     @PutMapping("/{id}")
     public UsuarioResponseDTO actualizarUsuario(@PathVariable int id,
-                                                @RequestBody UsuarioRequestDTO dto) {
-        return usuarioService.toDto(usuarioService.actualizarUsuario(id, dto));
+                                                @Valid @RequestBody UsuarioRequestDTO dto) {
+        return usuarioService.mapearToDto(usuarioService.actualizarUsuario(id, dto));
     }
 
     // Desactivar usuario - baja lógica, no elimina de la base de datos
@@ -69,7 +67,7 @@ public class UsuarioController {
     // Login con DNI y password
     @PostMapping("/login")
     public UsuarioResponseDTO login(@RequestBody UsuarioLoginRequestDTO loginRequest) {
-        return usuarioService.toDto(
+        return usuarioService.mapearToDto(
                 usuarioService.autenticar(loginRequest.getDni(), loginRequest.getPassword()));
     }
 }

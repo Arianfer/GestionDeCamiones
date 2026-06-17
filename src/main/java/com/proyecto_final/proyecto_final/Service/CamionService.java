@@ -1,5 +1,7 @@
 package com.proyecto_final.proyecto_final.Service;
 
+import com.proyecto_final.proyecto_final.DTO.Request.CamionRequestDTO;
+import com.proyecto_final.proyecto_final.DTO.Response.CamionResponseDTO;
 import com.proyecto_final.proyecto_final.Enums.EstadoCamion;
 import com.proyecto_final.proyecto_final.Model.Camion;
 import com.proyecto_final.proyecto_final.Repository.CamionRepository;
@@ -15,15 +17,19 @@ public class CamionService {
 
     private final CamionRepository camionRepository;
 
-    public Camion crearCamion(Camion camion) {
-        if (camionRepository.findByPatente(camion.getPatente()).isPresent()) {
-            throw new PatenteInvalidaException("Ya existe un camión registrado con la patente: " + camion.getPatente());
+    public CamionResponseDTO crearCamion(CamionRequestDTO camionDto) {
+
+        if (camionRepository.findByPatente(camionDto.getPatente()).isPresent()) {
+            throw new PatenteInvalidaException("Ya existe un camión registrado con la patente: " + camionDto.getPatente());
         }
-        return camionRepository.save(camion);
+
+        Camion camion = mapearToEntidad(camionDto);
+
+        return mapearToDto(camionRepository.save(camion));
     }
 
-    public List<Camion> listarCamiones() {
-        return camionRepository.findAll();
+    public List<CamionResponseDTO> listarCamiones() {
+        return camionRepository.findAll().stream().map(this::mapearToDto).toList();
     }
 
     public Camion buscarPorId(Long id) {
@@ -42,7 +48,7 @@ public class CamionService {
         return camionRepository.save(camion);
     }
 
-    public Camion actualizarCamion(Long id, Camion datosNuevos) {
+    public CamionResponseDTO actualizarCamion(Long id, CamionRequestDTO datosNuevos) {
         Camion camionExistente = buscarPorId(id);
 
         camionExistente.setPatente(datosNuevos.getPatente());
@@ -51,7 +57,7 @@ public class CamionService {
         camionExistente.setCapacidadCarga(datosNuevos.getCapacidadCarga());
         camionExistente.setConsumoDieselPorKm(datosNuevos.getConsumoDieselPorKm());
 
-        return camionRepository.save(camionExistente);
+        return mapearToDto(camionRepository.save(camionExistente));
     }
 
     public void eliminarCamion(Long id) {
@@ -60,9 +66,6 @@ public class CamionService {
     }
 
     /// Agregados que los necesitaba para el controller. Arian)
-    public Camion guardarCamion(Camion camion) {
-        return camionRepository.save(camion);
-    }
 
     public Double calcularCostoViaje(Long id, Double km) {
         // Buscamos el camión por ID usando el repository si no existe, lanzamos una excepción
@@ -81,5 +84,26 @@ public class CamionService {
         }
 
         return (km * consumoPorKm) * precioDiesel;
+    }
+
+    //MAPEOS
+    private CamionResponseDTO mapearToDto(Camion camion) {
+        return CamionResponseDTO.builder()
+                .id(camion.getId())
+                .patente(camion.getPatente())
+                .tipo(camion.getTipo().name())
+                .estado(camion.getEstadoCamion())
+                .capacidadCarga(camion.getCapacidadCarga())
+                .consumoDieselPorKm(camion.getConsumoDieselPorKm())
+                .build();
+    }
+    private Camion mapearToEntidad(CamionRequestDTO dto) {
+        return Camion.builder()
+                .patente(dto.getPatente())
+                .tipo(dto.getTipo())
+                .estadoCamion(dto.getEstadoCamion())
+                .capacidadCarga(dto.getCapacidadCarga())
+                .consumoDieselPorKm(dto.getConsumoDieselPorKm())
+                .build();
     }
 }

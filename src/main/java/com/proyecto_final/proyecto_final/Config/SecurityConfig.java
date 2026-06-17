@@ -31,13 +31,13 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                // 1. Permitimos peticiones previas de seguridad (CORS)
+                                // Permitimos peticiones previas de seguridad (CORS)
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                                // 2. HTML y estáticos libres para que cargue la web
+                                // Dejamos el HTML y estáticos libres para que cargue la web
                                 .requestMatchers("/", "/index.html").permitAll()
 
-                                // 3. Login libre para que todos puedan iniciar sesión
+                                // Dejamos Login libre para que todos puedan iniciar sesión
                                 .requestMatchers("/api/auth/**").permitAll()
 
                                 .requestMatchers(
@@ -48,10 +48,10 @@ public class SecurityConfig {
                                         "/webjars/**"
                                 ).permitAll()
 
-                                // 4. 🔒 CANDADO PUESTO: Solo jefes pueden gestionar/crear usuarios
+                                // Aca solo jefes pueden gestionar/crear usuarios
                                 .requestMatchers("/api/usuarios/**").hasAnyRole("ADMIN", "OFICINA")
 
-                                // 5. Todo lo demas (clientes, camiones, recorridos) requiere estar logueado
+                                // Y por ultimo lo demas (clientes, camiones, recorridos) requiere estar logueado
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->

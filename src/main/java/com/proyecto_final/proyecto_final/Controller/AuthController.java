@@ -19,13 +19,13 @@ public class AuthController {
     // Login - devuelve token JWT junto con los datos básicos del usuario
     @PostMapping("/login")
     public AuthResponseDTO login(@RequestBody UsuarioLoginRequestDTO loginRequest) {
-        // 1. Verificamos credenciales
+        // Verificamos credenciales
         Usuario usuario = usuarioService.autenticar(loginRequest.getDni(), loginRequest.getPassword());
 
-        // 2. Generamos el token JWT
+        // Generamos el token JWT
         String tokenJwt = jwtService.generarToken(usuario);
 
-        // 3. Devolvemos datos del usuario + token
+        // Devolvemos datos del usuario + token
         return convertirADto(usuario, tokenJwt);
     }
 

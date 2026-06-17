@@ -44,8 +44,8 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioResponseDTO> listarUsuarios() {
+        return usuarioRepository.findAll().stream().map(this::mapearToDto).toList();
     }
 
     public Usuario buscarPorId(int id) {
@@ -104,7 +104,8 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public UsuarioResponseDTO toDto(Usuario u) {
+    //MAPEOS
+    public UsuarioResponseDTO mapearToDto(Usuario u) {
         return UsuarioResponseDTO.builder()
                 .id(u.getId())
                 .nombre(u.getNombre())
