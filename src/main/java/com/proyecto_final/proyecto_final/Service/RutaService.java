@@ -15,29 +15,25 @@ import java.util.List;
 public class RutaService {
 
     private final RutaRepository rutaRepository;
-    // Inyectamos el servicio de usuarios para poder validar al chofer
     private final UsuarioService usuarioService;
 
-    // Crear ruta
     public Ruta crearRuta(Ruta ruta) {
-        // 1. Mantenemos tu validación original de nombre duplicado
+        // Validaciones
         if (rutaRepository.findByNombre(ruta.getNombre()).isPresent()) {
             throw new RuntimeException("Ya existe una ruta con el nombre: " + ruta.getNombre());
         }
 
-        // 2. Validar que venga el ID de un chofer desde el DTO
         if (ruta.getChofer() == null || ruta.getChofer().getId() == null) {
             throw new RuntimeException("La ruta debe tener un empleado asignado obligatoriamente.");
         }
 
-        // 3. Buscar al empleado y validar que su rol sea el correcto
         Usuario chofer = usuarioService.buscarPorId(ruta.getChofer().getId().intValue());
         if (!chofer.getRol().name().equals("EMPLEADO")) {
             throw new RuntimeException("Error: El usuario asignado a la ruta no es un Chofer (EMPLEADO).");
         }
         ruta.setChofer(chofer);
 
-        // 4. Manejo inteligente de fecha: si la oficina no mandó fecha, asignamos la de hoy
+        // Si la oficina no mandó fecha, asignamos la de hoy
         if (ruta.getFecha() == null) {
             ruta.setFecha(LocalDate.now());
         }
@@ -45,28 +41,23 @@ public class RutaService {
         return rutaRepository.save(ruta);
     }
 
-    // Listar todas
     public List<Ruta> listarRutas() {
         return rutaRepository.findAll();
     }
 
-    // Buscar por ID
     public Ruta buscarPorId(Long id) {
         return rutaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ruta no encontrada con id: " + id));
     }
 
-    // Buscar por nombre
     public Ruta buscarPorNombre(String nombre) {
         return rutaRepository.findByNombre(nombre)
                 .orElseThrow(() -> new RuntimeException("Ruta no encontrada con nombre: " + nombre));
     }
 
-    // Actualizar ruta
     public Ruta actualizarRuta(Long id, Ruta datosNuevos) {
         Ruta rutaExistente = buscarPorId(id);
 
-        // Mantenemos tus actualizaciones originales
         rutaExistente.setNombre(datosNuevos.getNombre());
         rutaExistente.setDescripcion(datosNuevos.getDescripcion());
 
@@ -87,16 +78,14 @@ public class RutaService {
         return rutaRepository.save(rutaExistente);
     }
 
-    // Eliminar ruta
     public void eliminarRuta(Long id) {
-        buscarPorId(id); // verifica que existe antes de eliminar
+        buscarPorId(id);
         rutaRepository.deleteById(id);
     }
 
     public Ruta buscarRutaParaChofer(Long id) {
         Ruta ruta = buscarPorId(id);
         if (ruta.getServicios() == null || ruta.getServicios().isEmpty()) {
-            // LANZAR ACÁ:
             throw new RutaNoHalladaException("La ruta '" + ruta.getNombre() + "' no tiene puntos de recolección asignados todavía.");
         }
         return ruta;

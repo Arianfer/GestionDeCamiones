@@ -13,14 +13,13 @@ public class ClienteService {
 
     private final ClienteRepository clienteRepository;
 
-    // Crear un cliente con validaciones de unicidad
+
     public Cliente crearCliente(Cliente cliente) {
-        // 1. Validar CUIT único
+
+        //Validaciones
         if (clienteRepository.existsByCuit(cliente.getCuit())) {
             throw new RuntimeException("Ya existe un cliente registrado con el CUIT: " + cliente.getCuit());
         }
-
-        // 2. Validar Razón Social única
         if (clienteRepository.existsByRazonSocial(cliente.getRazonSocial())) {
             throw new RuntimeException("Ya existe un cliente registrado con la Razón Social: " + cliente.getRazonSocial());
         }
@@ -28,24 +27,20 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
-    // Listar todos los clientes (Útil para combos desplegables en el frontend)
     public List<Cliente> listarClientes() {
         return clienteRepository.findAll();
     }
 
-    // Buscar por ID
     public Cliente buscarPorId(Long id) {
         return clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado con el ID: " + id));
     }
 
-    // Buscar por CUIT
     public Cliente buscarPorCuit(String cuit) {
         return clienteRepository.findByCuit(cuit)
                 .orElseThrow(() -> new RuntimeException("No se encontró ningún cliente con el CUIT: " + cuit));
     }
 
-    // Actualizar Cliente
     public Cliente actualizarCliente(Long id, Cliente datosNuevos) {
         Cliente clienteExistente = buscarPorId(id);
 
@@ -57,9 +52,8 @@ public class ClienteService {
         return clienteRepository.save(clienteExistente);
     }
 
-    // Eliminar Cliente
     public void eliminarCliente(Long id) {
-        buscarPorId(id); // Valida existencia
+        buscarPorId(id);
         clienteRepository.deleteById(id);
     }
 }

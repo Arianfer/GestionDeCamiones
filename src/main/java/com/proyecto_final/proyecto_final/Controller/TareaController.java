@@ -20,24 +20,22 @@ public class TareaController {
 
     private final TareaService tareaService;
 
-    // Listar todas las tareas (oficina)
     @GetMapping
     public ResponseEntity<List<TareaResponseDTO>> listarTareas() {
         return ResponseEntity.ok(tareaService.listarTareas());
     }
-    // Obtener tarea por ID
+
     @GetMapping("/{id}")
     public ResponseEntity<TareaResponseDTO> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(tareaService.obtenerPorId(id));
     }
 
-    // Crear tarea (oficina)
     @PostMapping
     public ResponseEntity<TareaResponseDTO> crearTarea(@RequestBody TareaRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(tareaService.crearTarea(dto));
     }
 
-    // Actualizar estado (chofer o oficina)
+    // Actualizar estado, puede ser chofer u oficina
     @PatchMapping("/{id}/estado")
     public ResponseEntity<TareaResponseDTO> actualizarEstado(
             @PathVariable Long id,

@@ -19,7 +19,6 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private final JwtService jwtService;
 
     @GetMapping
     public List<UsuarioResponseDTO> listar() {
@@ -29,6 +28,12 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public UsuarioResponseDTO obtenerPorId(@PathVariable int id) {
         return usuarioService.mapeartoDTO(usuarioService.buscarPorId(id));
+    }
+
+    @GetMapping("/dni/{dni}")
+    public UsuarioResponseDTO buscarPorDni(@PathVariable String dni) {
+
+        return usuarioService.mapeartoDTO(usuarioService.buscarPorDni(dni));
     }
 
     @PostMapping
@@ -52,12 +57,5 @@ public class UsuarioController {
         Usuario usuario = usuarioService.autenticar(loginRequest.getDni(), loginRequest.getPassword());
 
         return usuarioService.mapeartoDTO(usuario);
-    }
-
-    // Buscar usuario por DNI
-    @GetMapping("/dni/{dni}")
-    public UsuarioResponseDTO buscarPorDni(@PathVariable String dni) {
-
-        return usuarioService.mapeartoDTO(usuarioService.buscarPorDni(dni));
     }
 }

@@ -33,7 +33,7 @@ public class TareaService {
 
     public TareaResponseDTO crearTarea(TareaRequestDTO dto) {
 
-        //Reviso que todas las entidades existan
+        //Valido que exista camion, ruta y usuario
         Camion camion = camionRepository.findById(dto.getIdCamion())
                 .orElseThrow(() -> new CamionNoDisponibleException("Camión no encontrado"));
 
@@ -66,7 +66,6 @@ public class TareaService {
         return tareaToDto(tareaRepository.save(tarea));
     }
 
-    // LISTADO TAREAS
     public List<TareaResponseDTO> listarTareas() {
         return tareaRepository.findAll()
                 .stream()
@@ -74,14 +73,12 @@ public class TareaService {
                 .toList();
     }
 
-    // Tarea por ID
     public TareaResponseDTO obtenerPorId(Long id) {
         Tarea tarea = tareaRepository.findById(id)
                 .orElseThrow(() -> new TareaNoEncontradaException("Tarea no encontrada"));
         return tareaToDto(tarea);
     }
 
-    // Actualizar
     public TareaResponseDTO actualizarEstado(Long id, EstadoTarea nuevoEstado) {
         Tarea tarea = tareaRepository.findById(id)
                 .orElseThrow(() -> new TareaNoEncontradaException("Tarea no encontrada"));
@@ -98,7 +95,6 @@ public class TareaService {
         return tareaToDto(tareaRepository.save(tarea));
     }
 
-    // ── Endpoint estrella: ruta del chofer ────────────────────────────────────
     public RutaResponseDTO obtenerRutaDeChofer(Long choferId) {
 
         // Busca la tarea PENDIENTE o EN_CURSO del chofer

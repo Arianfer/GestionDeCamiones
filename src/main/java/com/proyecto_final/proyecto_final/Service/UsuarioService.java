@@ -54,7 +54,6 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
     }
 
-    // Nuevo método para buscar por DNI
     public Usuario buscarPorDni(String dni) {
         return usuarioRepository.findByDni(dni)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con DNI: " + dni));
@@ -94,6 +93,7 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    // MAPEOS
     public Usuario mapeartoEntidad(UsuarioRequestDTO dto) {
         return Usuario.builder()
                 .nombre(dto.getNombre())

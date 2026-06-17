@@ -18,7 +18,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Manejador para tus excepciones de negocio (Bad Request - 400)
+    // Manejador de nuestras excepciones de negocio, (Bad Request - 400)
     @ExceptionHandler({
             CamionNoDisponibleException.class,
             PatenteInvalidaException.class,
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(cuerpo, HttpStatus.BAD_REQUEST);
     }
 
-    // 2. Manejador secundario por si se escapa cualquier otro error genérico (Internal Server Error - 500)
+    // Manejador secundario por si se escapa cualquier otro error genérico, ej: Internal Server Error - 500
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, Object>> manejarNoEncontrado(
             NoResourceFoundException ex) {
@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(cuerpo, HttpStatus.NOT_FOUND);
     }
+    //Manejador de validaciones al cargar, que da respuestas especificas
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> manejarErroresValidacion(
             MethodArgumentNotValidException ex) {

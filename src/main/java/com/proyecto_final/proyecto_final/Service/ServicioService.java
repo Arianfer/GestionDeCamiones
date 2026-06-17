@@ -20,16 +20,15 @@ public class ServicioService {
     private final ClienteRepository clienteRepository;
 
     public Servicio crearServicio(Servicio servicio) {
-        // 1. Validar que la ruta exista
+        // Validaciones ruta
         if (servicio.getRuta() != null) {
-            Long rutaId = (long) servicio.getRuta().getIdRuta();
+            Long rutaId = servicio.getRuta().getIdRuta();
             rutaRepository.findById(rutaId)
                     .orElseThrow(() -> new RuntimeException("La ruta especificada no existe"));
         } else {
             throw new RuntimeException("El servicio debe estar asignado a una ruta");
         }
-
-        // 2. Validar que el cliente exista en la base de datos
+        // Validacion cliente
         if (servicio.getCliente() != null && servicio.getCliente().getId() != null) {
             clienteRepository.findById(servicio.getCliente().getId())
                     .orElseThrow(() -> new RuntimeException("El cliente asociado no existe"));

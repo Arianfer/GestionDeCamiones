@@ -14,17 +14,17 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UsuarioService usuarioService;
-    private final JwtService jwtService; // <-- Lo inyectamos acá
+    private final JwtService jwtService;
 
     @PostMapping("/login")
     public UsuarioResponseDTO login(@RequestBody UsuarioLoginRequestDTO loginRequest) {
-        // 1. Verificamos credenciales
+        // Verificamos credenciales
         Usuario usuario = usuarioService.autenticar(loginRequest.getDni(), loginRequest.getPassword());
 
-        // 2. Fabricamos el Token JWT
+        // Fabricamos el Token JWT
         String tokenJwt = jwtService.generarToken(usuario);
 
-        // 3. Devolvemos todo junto
+        // Devolvemos todo junto
         return convertirADto(usuario, tokenJwt);
     }
 
@@ -37,7 +37,7 @@ public class AuthController {
                 .email(usuario.getEmail())
                 .rol(usuario.getRol())
                 .activo(usuario.isActivo())
-                .token(token) // <-- Se lo metemos a la respuesta
+                .token(token)
                 .build();
     }
 }

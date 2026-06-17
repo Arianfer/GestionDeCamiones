@@ -22,7 +22,7 @@ public class Tarea {
     private LocalDateTime fechaEjecucion;
 
     @Enumerated(EnumType.STRING)
-    private EstadoTarea estado; // PENDIENTE, COMPLETADA, CANCELADA, INCOVENIENTE
+    private EstadoTarea estado;
 
     // La tarea sabe a qué camión y ruta pertenece directamente
     @ManyToOne
@@ -33,6 +33,7 @@ public class Tarea {
     @JoinColumn(name = "id_ruta")
     private Ruta ruta;
 
+    // La tarea tiene un Usuario(Chofer) asignado
     @ManyToOne
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
