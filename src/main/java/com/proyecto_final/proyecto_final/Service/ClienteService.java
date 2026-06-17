@@ -1,5 +1,7 @@
 package com.proyecto_final.proyecto_final.Service;
 
+import com.proyecto_final.proyecto_final.DTO.Request.ClienteRequestDTO;
+import com.proyecto_final.proyecto_final.DTO.Response.ClienteResponseDTO;
 import com.proyecto_final.proyecto_final.Model.Cliente;
 import com.proyecto_final.proyecto_final.Repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,9 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
 
 
-    public Cliente crearCliente(Cliente cliente) {
+    public ClienteResponseDTO crearCliente(ClienteRequestDTO clienteDTO) {
+
+        Cliente cliente = mapearToEntidad(clienteDTO);
 
         //Validaciones
         if (clienteRepository.existsByCuit(cliente.getCuit())) {
@@ -24,11 +28,13 @@ public class ClienteService {
             throw new RuntimeException("Ya existe un cliente registrado con la Razón Social: " + cliente.getRazonSocial());
         }
 
-        return clienteRepository.save(cliente);
+        return mapearToDTO(clienteRepository.save(cliente));
     }
 
-    public List<Cliente> listarClientes() {
-        return clienteRepository.findAll();
+    public List<ClienteResponseDTO> listarClientes() {
+        return clienteRepository.findAll().stream()
+                .map(this::mapearToDTO)
+                .toList();
     }
 
     public Cliente buscarPorId(Long id) {
@@ -41,7 +47,7 @@ public class ClienteService {
                 .orElseThrow(() -> new RuntimeException("No se encontró ningún cliente con el CUIT: " + cuit));
     }
 
-    public Cliente actualizarCliente(Long id, Cliente datosNuevos) {
+    public ClienteResponseDTO actualizarCliente(Long id, ClienteRequestDTO datosNuevos) {
         Cliente clienteExistente = buscarPorId(id);
 
         // Ojo: Si van a editar el CUIT o Razón Social, habría que validar que no choquen
@@ -49,11 +55,26 @@ public class ClienteService {
         clienteExistente.setRazonSocial(datosNuevos.getRazonSocial());
         clienteExistente.setCuit(datosNuevos.getCuit());
 
-        return clienteRepository.save(clienteExistente);
+        return mapearToDTO(clienteRepository.save(clienteExistente));
     }
 
     public void eliminarCliente(Long id) {
         buscarPorId(id);
         clienteRepository.deleteById(id);
+    }
+
+    // MAPEOS
+    public Cliente mapearToEntidad(ClienteRequestDTO dto) {
+        return Cliente.builder()
+                .cuit(dto.getCuit())
+                .razonSocial(dto.getRazonSocial())
+                .build();
+    }
+    public ClienteResponseDTO mapearToDTO(Cliente cliente) {
+        return ClienteResponseDTO.builder()
+                .id(cliente.getId())
+                .cuit(cliente.getCuit())
+                .razonSocial(cliente.getRazonSocial())
+                .build();
     }
 }
