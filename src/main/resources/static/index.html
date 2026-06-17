@@ -782,15 +782,18 @@
                 if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay camiones registrados.</td></tr>'; return; }
                 let filas = '';
                 data.forEach(cam => {
-                    let colorEstado = cam.estadoCamion === 'DISPONIBLE' ? '#28a745' : (cam.estadoCamion === 'EN_MANTENIMIENTO' ? '#ffc107' : '#dc3545');
+                    // FIX: Leemos 'estado' o 'estadoCamion' por si cambiaron el nombre en el backend
+                    let estadoReal = cam.estado || cam.estadoCamion || 'DESCONOCIDO';
+
+                    let colorEstado = estadoReal === 'DISPONIBLE' ? '#28a745' : (estadoReal === 'EN_MANTENIMIENTO' ? '#ffc107' : '#dc3545');
                     filas += `
                 <tr>
                     <td><strong>${cam.patente}</strong></td>
                     <td>${cam.tipo}</td>
-                    <td><span style="color: ${colorEstado}; font-weight: bold;">${cam.estadoCamion.replace('_', ' ')}</span></td>
+                    <td><span style="color: ${colorEstado}; font-weight: bold;">${estadoReal.replace('_', ' ')}</span></td>
                     <td>${cam.capacidadCarga} kg</td>
                     <td style="text-align: center;">
-                       <button class="btn-icono btn-icono-rojo" title="Eliminar" onclick="eliminarCamion(${cam.id})">🗑️</button>
+                       <button class="btn-icono btn-icono-rojo" title="Eliminar" onclick="eliminarCamion(${cam.id || `'${cam.patente}'`})">🗑️</button>
                     </td>
                 </tr>`;
                 });
