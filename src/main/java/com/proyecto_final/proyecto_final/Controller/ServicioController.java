@@ -6,6 +6,7 @@ import com.proyecto_final.proyecto_final.Model.Cliente;
 import com.proyecto_final.proyecto_final.Model.Ruta;
 import com.proyecto_final.proyecto_final.Model.Servicio;
 import com.proyecto_final.proyecto_final.Service.ServicioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +32,13 @@ public class ServicioController {
     }
 
     @PostMapping
-    public ServicioResponseDTO guardar(@RequestBody ServicioRequestDTO request) {
+    public ServicioResponseDTO guardar(@Valid @RequestBody ServicioRequestDTO request) {
         Servicio servicio = toEntity(request);
         return toResponseDto(servicioService.crearServicio(servicio));
     }
 
     @PutMapping("/{id}")
-    public ServicioResponseDTO actualizar(@PathVariable Long id, @RequestBody ServicioRequestDTO request) {
+    public ServicioResponseDTO actualizar(@PathVariable Long id, @Valid @RequestBody ServicioRequestDTO request) {
         Servicio servicio = toEntity(request);
         return toResponseDto(servicioService.actualizarServicio(id, servicio));
     }
