@@ -58,14 +58,6 @@ El objetivo principal es centralizar la gestión de la flota y optimizar la plan
 git clone https://github.com/Arianfer/GestionDeCamiones.git
 ```
 
-### Configurar la Base de Datos
-
-Crear una base de datos MySQL:
-
-```sql
-CREATE DATABASE gestion_camiones;
-```
-
 ### Configurar application.properties
 
 Completar los siguientes parámetros:
@@ -215,8 +207,8 @@ Request
 
 ```json
 {
-  "dni": "12345678",
-  "password": "1234"
+  "dni": "40123456",
+  "password": "123456"
 }
 ```
 
@@ -263,7 +255,6 @@ Request
   "tipo": "RECOLECTOR",
   "estadoCamion": "DISPONIBLE",
   "capacidadCarga": 12000,
-  "consumoDieselPorKm": 0.35
 }
 ```
 
@@ -282,10 +273,10 @@ Response
 
 En caso de utilizar datos de prueba:
 
-| Usuario | Contraseña | Rol    |
-| ------- | ---------- | ------ |
-| admin   | admin123   | ADMIN  |
-| chofer1 | chofer123  | CHOFER |
+| Usuario  | Contraseña | Rol    |
+| -------  | ---------- | ------ |
+| 40123456 | 123456     | ADMIN  |
+| 35987654 | 123456     | CHOFER |
 
 ---
 
