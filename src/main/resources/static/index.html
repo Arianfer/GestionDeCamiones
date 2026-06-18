@@ -400,6 +400,28 @@
             <button class="btn-success" onclick="ejecutarCrearUsuario()">Guardar Usuario</button>
 
             <h3 style="margin-top: 25px; color: #333;">Personal Registrado</h3>
+
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input
+                        type="text"
+                        id="buscar-dni"
+                        placeholder="Buscar por DNI"
+                        style="flex:1;">
+
+                <button
+                        class="btn-primary"
+                        style="width:auto; margin:0;"
+                        onclick="buscarUsuarioPorDni()">
+                    🔍 Buscar
+                </button>
+
+                <button
+                        class="btn-danger"
+                        style="width:auto; margin:0;"
+                        onclick="cargarUsuarios()">
+                    Mostrar todos
+                </button>
+            </div>
             <div style="overflow-x: auto;">
                 <table class="tabla-datos">
                     <thead>
@@ -912,8 +934,18 @@
                         <td>${u.email}</td>
                         <td><strong>${u.rol}</strong></td>
                         <td><span style="color: ${estadoColor}; font-weight: bold;">${estadoTexto}</span></td>
-                        <td style="text-align: center;">
-                            <button class="btn-icono btn-icono-rojo" title="Desactivar" onclick="desactivarUsuario(${u.id})">🚫</button>
+                        <td style="text-align:center">
+                            <button class="btn-icono"
+                                    onclick="editarUsuario(${u.id})"
+                                    title="Editar">
+                                ✏️
+                            </button>
+
+                            <button class="btn-icono btn-icono-rojo"
+                                    onclick="desactivarUsuario(${u.id})"
+                                    title="Desactivar">
+                                🗑️
+                            </button>
                         </td>
                     </tr>`;
                 });
@@ -967,6 +999,152 @@
                     }).catch(err => mostrarError(err.message));
             }
         });
+    }
+
+    function editarUsuario(id) {
+
+        const token = localStorage.getItem('token_jwt');
+
+        fetch(`${API_URL}/usuarios/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(res => {
+
+                if (!res.ok) {
+                    throw new Error("No tiene permisos para editar este usuario");
+                }
+
+                return res.json();
+            })            .then(usuario => {
+
+                Swal.fire({
+                    title: 'Editar Usuario',
+                    html: `
+                <input id="swal-nombre" class="swal2-input" placeholder="Nombre" value="${usuario.nombre}">
+                <input id="swal-apellido" class="swal2-input" placeholder="Apellido" value="${usuario.apellido}">
+                <input id="swal-dni" class="swal2-input" placeholder="DNI" value="${usuario.dni}">
+                <input id="swal-email" class="swal2-input" placeholder="Email" value="${usuario.email}">
+            `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar',
+                    cancelButtonText: 'Cancelar',
+
+                    preConfirm: () => {
+                        return {
+                            nombre: document.getElementById('swal-nombre').value,
+                            apellido: document.getElementById('swal-apellido').value,
+                            dni: document.getElementById('swal-dni').value,
+                            email: document.getElementById('swal-email').value,
+                            rol: usuario.rol
+                        };
+                    }
+                }).then(result => {
+
+                    if (!result.isConfirmed) return;
+
+                    fetch(`${API_URL}/usuarios/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(result.value)
+                    })
+                        .then(res => {
+                            if (!res.ok) {
+                                throw new Error('No se pudo actualizar');
+                            }
+
+                            Swal.fire(
+                                'Actualizado',
+                                'Usuario actualizado correctamente',
+                                'success'
+                            );
+
+                            cargarUsuarios();
+                        })
+                        .catch(err => {
+                            Swal.fire(
+                                'Error',
+                                err.message,
+                                'error'
+                            );
+                        });
+
+                });
+
+            })
+            .catch(err => {
+                Swal.fire(
+                    'Error',
+                    err.message,
+                    'error'
+                );
+            });
+    }
+    async function buscarUsuarioPorDni() {
+
+        const token = localStorage.getItem('token_jwt');
+        const dni = document.getElementById("buscar-dni").value.trim();
+
+        if (!dni) {
+            Swal.fire("Error", "Ingrese un DNI", "warning");
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                `${API_URL}/usuarios/dni/${dni}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("No existe un usuario con ese DNI");
+            }
+
+            const usuario = await response.json();
+
+            document.getElementById("tabla-usuarios-body").innerHTML = `
+            <tr>
+                <td>${usuario.id}</td>
+                <td>${usuario.nombre}</td>
+                <td>${usuario.apellido}</td>
+                <td>${usuario.dni}</td>
+                <td>${usuario.email}</td>
+                <td>${usuario.rol}</td>
+                <td>${usuario.activo ? 'Activo' : 'Inactivo'}</td>
+                <td style="text-align:center;">
+                    <button class="btn-icono"
+                            onclick="editarUsuario(${usuario.id})"
+                            title="Editar">
+                        ✏️
+                    </button>
+
+                    <button class="btn-icono btn-icono-rojo"
+                            onclick="desactivarUsuario(${usuario.id})"
+                            title="Desactivar">
+                        🗑️
+                    </button>
+            </td>
+            </tr>
+        `;
+
+        } catch (error) {
+
+            Swal.fire(
+                "No encontrado",
+                error.message,
+                "error"
+            );
+
+        }
     }
 
     // ==========================================

@@ -72,8 +72,14 @@ public class UsuarioService {
 
     // Nuevo metodo para buscar por DNI
     public Usuario buscarPorDni(String dni) {
-        return usuarioRepository.findByDni(dni)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con DNI: " + dni));
+
+        Usuario usuario = usuarioRepository.findByDni(dni)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuario no encontrado con DNI: " + dni));
+
+        validarPermisoSobreUsuario(usuario);
+
+        return usuario;
     }
 
     // Autenticación cambiada para que pida el DNI en vez del Email
