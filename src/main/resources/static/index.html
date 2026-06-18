@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ciageser - Control de Operaciones</title>
-    <!-- LIBRERÍA PARA ALERTAS LINDAS (SWEETALERT2) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -146,16 +145,22 @@
 
         /* FIX DEFINITIVO PARA QUE SWEETALERT NO SE DESBORDE EN EL CELULAR */
         .swal2-popup {
-            width: 90% !important; /* Que la alerta no toque los bordes del celular */
+            width: 90% !important;
             max-width: 400px !important;
         }
         .swal2-select, .swal2-input, .swal2-textarea {
-            min-width: 0 !important; /* SweetAlert a veces fuerza min-widths gigantes */
-            width: 90% !important; /* Que no se salga del cuadrito */
+            min-width: 0 !important;
+            width: 90% !important;
             max-width: 100% !important;
-            margin: 15px auto !important; /* Centrado perfecto izquierda/derecha */
+            margin: 15px auto !important;
             box-sizing: border-box !important;
             font-size: 15px !important;
+        }
+        /* REGLA ANTIFANTASMAS */
+        .swal2-input[style*="display: none"],
+        .swal2-select[style*="display: none"],
+        .swal2-textarea[style*="display: none"] {
+            display: none !important;
         }
     </style>
 </head>
@@ -195,7 +200,6 @@
     </div>
 
     <div class="pad-container">
-        <!-- VISTA CLIENTES -->
         <div id="vista-clientes" class="vista-contenido">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0; color: #333;">Directorio de Clientes</h3>
@@ -238,53 +242,109 @@
             </div>
         </div>
 
-        <!-- VISTA SERVICIOS (UBICACIONES) -->
         <div id="vista-servicios" class="vista-contenido">
-            <h3 style="margin-top: 0; color: #333;">Nueva Ubicación de Recolección</h3>
-            <div class="form-group">
-                <label>Nombre del Punto:</label>
-                <input type="text" id="srv-nombre" placeholder="Ej: Manolo Sucursal Alem">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: #333;">Directorio de Ubicaciones</h3>
+                <button class="btn-success" style="width: auto; margin: 0; padding: 8px 15px; font-size: 13px;" onclick="mostrarFormularioServicio()">➕ Alta Ubicación</button>
             </div>
-            <div class="form-group">
-                <label>Dirección:</label>
-                <input type="text" id="srv-direccion" placeholder="Ej: Alem 3800">
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="text" id="buscador-servicios" placeholder="🔍 Buscar por nombre o dirección..." onkeyup="filtrarServicios()">
             </div>
-            <div class="form-group">
-                <label>Prioridad:</label>
-                <select id="srv-prioridad">
-                    <option value="ALTA">ALTA</option>
-                    <option value="MEDIA">MEDIA</option>
-                    <option value="BAJA">BAJA</option>
-                </select>
+
+            <div id="form-servicio-box" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; color: #333;">Nueva Ubicación de Recolección</h4>
+                <div class="form-group">
+                    <label>Nombre del Punto:</label>
+                    <input type="text" id="srv-nombre" placeholder="Ej: Manolo Sucursal Alem">
+                </div>
+                <div class="form-group">
+                    <label>Dirección:</label>
+                    <input type="text" id="srv-direccion" placeholder="Ej: Alem 3800">
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 150px;">
+                        <div class="form-group">
+                            <label>Latitud:</label>
+                            <input type="number" step="any" id="srv-latitud" placeholder="Ej: -38.0055">
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <div class="form-group">
+                            <label>Longitud:</label>
+                            <input type="number" step="any" id="srv-longitud" placeholder="Ej: -57.5426">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 150px;">
+                        <div class="form-group">
+                            <label>Prioridad:</label>
+                            <select id="srv-prioridad">
+                                <option value="ALTA">ALTA</option>
+                                <option value="MEDIA">MEDIA</option>
+                                <option value="BAJA">BAJA</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <div class="form-group">
+                            <label>Tipo de Residuo:</label>
+                            <select id="srv-residuo">
+                                <option value="GENERAL">General (Basura común)</option>
+                                <option value="RECICLABLE">Reciclable (Plástico, cartón, etc)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Frecuencia:</label>
+                    <select id="srv-frecuencia">
+                        <option value="DIARIA">Todos los días (Diaria)</option>
+                        <option value="SEMANAL">Semanal (Ej: Lunes, Miérc. y Viernes)</option>
+                        <option value="QUINCENAL">Quincenal (Cada 15 días)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Recorrido Perteneciente:</label>
+                    <select id="srv-ruta">
+                        <option value="">Cargando recorridos...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cliente (Dueño):</label>
+                    <select id="srv-cliente">
+                        <option value="">Cargando clientes...</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn-success" style="flex: 1; padding: 8px 0;" onclick="ejecutarCrearServicio()">Guardar</button>
+                    <button class="btn-danger" style="flex: 1; padding: 8px 0;" onclick="ocultarFormularioServicio()">Cancelar</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Tipo de Residuo:</label>
-                <input type="text" id="srv-residuo" placeholder="Ej: ORGANICO o INORGANICO">
+
+            <div style="overflow-x: auto;">
+                <table class="tabla-datos">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Dirección</th>
+                        <th>Prioridad</th>
+                        <th>Residuo</th>
+                        <th style="text-align: center;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabla-servicios-body">
+                    <tr><td colspan="6" style="text-align: center;">Cargando ubicaciones...</td></tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label>Frecuencia:</label>
-                <select id="srv-frecuencia">
-                    <option value="TODOS_LOS_DIAS">Todos los días</option>
-                    <option value="LUNES_MIERCOLES_VIERNES">Lunes, Miércoles y Viernes</option>
-                    <option value="MARTES_JUEVES_SABADOS">Martes, Jueves y Sábados</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Recorrido Perteneciente:</label>
-                <select id="srv-ruta">
-                    <option value="">Cargando recorridos...</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Cliente (Dueño):</label>
-                <select id="srv-cliente">
-                    <option value="">Cargando clientes...</option>
-                </select>
-            </div>
-            <button class="btn-success" onclick="ejecutarCrearServicio()">Guardar Ubicación</button>
         </div>
 
-        <!-- VISTA RUTAS (RECORRIDOS) -->
         <div id="vista-rutas" class="vista-contenido vista-activa">
             <div class="admin-element" style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #e0e0e0;">
                 <h4 style="margin-top: 0; color: #333; font-size: 15px;">➕ Registrar Nuevo Recorrido</h4>
@@ -296,6 +356,10 @@
                     <div style="flex: 2; min-width: 180px;">
                         <label style="font-size: 12px; color: #555;">Descripción / Zona:</label>
                         <input type="text" id="rec-descripcion" placeholder="Ej: Zona Centro - Mañana" style="padding: 6px; font-size: 13px;">
+                    </div>
+                    <div style="flex: 1; min-width: 130px;">
+                        <label style="font-size: 12px; color: #555;">Fecha programada:</label>
+                        <input type="date" id="rec-fecha" style="padding: 6px; font-size: 13px;">
                     </div>
                     <div style="flex: 1; min-width: 120px;">
                         <label style="font-size: 12px; color: #555;">Chofer Asignado:</label>
@@ -313,7 +377,6 @@
             </div>
         </div>
 
-        <!-- VISTA CAMIONES -->
         <div id="vista-camiones" class="vista-contenido">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0; color: #333;">Flota de Camiones</h3>
@@ -370,7 +433,6 @@
             </div>
         </div>
 
-        <!-- VISTA USUARIOS (PERSONAL) -->
         <div id="vista-usuarios" class="vista-contenido">
             <h3 style="margin-top: 0; color: #333;">Registrar Nuevo Personal</h3>
             <div class="form-group">
@@ -446,7 +508,6 @@
     </div>
 </div>
 
-<!-- MÓVIL CHOFER -->
 <div class="container-mobile" id="interfaz-movil">
     <div class="header-mobile">
         <strong id="chofer-nombre">Chofer: Cargando...</strong>
@@ -471,6 +532,7 @@
 
 <script>
     const API_URL = 'http://localhost:8080/api';
+    let listaServiciosGlobal = [];
 
     // SWEET ALERT WRAPPERS
     function mostrarExito(mensaje) { Swal.fire({ title: '¡Éxito!', text: mensaje, icon: 'success', confirmButtonColor: '#17a2b8' }); }
@@ -553,15 +615,12 @@
         if (pestania === 'clientes') cargarClientes();
         if (pestania === 'usuarios') cargarUsuarios();
         if (pestania === 'camiones') cargarCamiones();
+        if (pestania === 'servicios') cargarServicios();
     }
 
-    // ==========================================
-    // CARGA DINÁMICA DE SELECTS
-    // ==========================================
     function cargarOpcionesDesplegables() {
         const token = localStorage.getItem('token_jwt');
 
-        // 1. Choferes
         fetch(`${API_URL}/usuarios`, { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => {
@@ -573,7 +632,6 @@
                 });
             }).catch(e => console.log('Silenciando error:', e));
 
-        // 2. Rutas
         fetch(`${API_URL}/rutas`, { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => {
@@ -585,7 +643,6 @@
                 });
             }).catch(e => console.log('Silenciando error:', e));
 
-        // 3. Clientes
         fetch(`${API_URL}/clientes`, { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => {
@@ -652,11 +709,12 @@
         const token = localStorage.getItem('token_jwt');
         const nombre = document.getElementById('rec-nombre').value;
         const descripcion = document.getElementById('rec-descripcion').value;
+        const fecha = document.getElementById('rec-fecha').value;
         const idChofer = document.getElementById('rec-chofer').value;
 
-        if (!nombre || !descripcion) { mostrarError('El código y descripción son obligatorios.'); return; }
+        if (!nombre || !descripcion || !fecha) { mostrarError('El código, la descripción y la fecha son obligatorios.'); return; }
 
-        const bodyData = { nombre, descripcion };
+        const bodyData = { nombre, descripcion, fecha };
         if (idChofer) bodyData.idChofer = parseInt(idChofer);
 
         fetch(`${API_URL}/rutas`, {
@@ -669,6 +727,7 @@
                 mostrarExito(`¡Recorrido "${data.nombre}" registrado!`);
                 document.getElementById('rec-nombre').value = '';
                 document.getElementById('rec-descripcion').value = '';
+                document.getElementById('rec-fecha').value = '';
                 document.getElementById('rec-chofer').value = '';
                 cargarRutas();
                 cargarOpcionesDesplegables();
@@ -804,9 +863,7 @@
                 if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay camiones registrados.</td></tr>'; return; }
                 let filas = '';
                 data.forEach(cam => {
-                    // FIX: Leemos 'estado' o 'estadoCamion' por si cambiaron el nombre en el backend
                     let estadoReal = cam.estado || cam.estadoCamion || 'DESCONOCIDO';
-
                     let colorEstado = estadoReal === 'DISPONIBLE' ? '#28a745' : (estadoReal === 'EN_MANTENIMIENTO' ? '#ffc107' : '#dc3545');
                     filas += `
                 <tr>
@@ -863,7 +920,7 @@
 
     function eliminarCamion(patente) {
         Swal.fire({
-            title: `¿Eliminar camión ${patente}?`, icon: 'warning', showCancelButton: true,
+            title: `¿Eliminar camión?`, icon: 'warning', showCancelButton: true,
             confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d', confirmButtonText: 'Sí, eliminar'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -879,8 +936,55 @@
     }
 
     // ==========================================
-    // UBICACIONES
+    // UBICACIONES (SERVICIOS)
     // ==========================================
+    function cargarServicios() {
+        const token = localStorage.getItem('token_jwt');
+        const tbody = document.getElementById('tabla-servicios-body');
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Cargando ubicaciones...</td></tr>';
+
+        fetch(`${API_URL}/servicios`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(res => res.json())
+            .then(data => {
+                if (!Array.isArray(data)) throw new Error('Formato inválido');
+                listaServiciosGlobal = data;
+                renderizarTablaServicios(data);
+            })
+            .catch(err => { tbody.innerHTML = `<tr><td colspan="6" class="error">Error: ${err.message}</td></tr>`; });
+    }
+
+    function renderizarTablaServicios(data) {
+        const tbody = document.getElementById('tabla-servicios-body');
+        if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay ubicaciones registradas.</td></tr>'; return; }
+        let filas = '';
+        data.forEach(srv => {
+            filas += `
+            <tr>
+                <td><strong>${srv.id}</strong></td>
+                <td>${srv.nombre}</td>
+                <td>${srv.direccion}</td>
+                <td>${srv.prioridad}</td>
+                <td>${srv.tipoResiduo}</td>
+                <td style="text-align: center;">
+                    <button class="btn-icono btn-icono-rojo" title="Eliminar" onclick="eliminarServicio(${srv.id})">🗑️</button>
+                </td>
+            </tr>`;
+        });
+        tbody.innerHTML = filas;
+    }
+
+    function filtrarServicios() {
+        const texto = document.getElementById('buscador-servicios').value.toLowerCase();
+        const filtrados = listaServiciosGlobal.filter(srv =>
+            srv.nombre.toLowerCase().includes(texto) ||
+            srv.direccion.toLowerCase().includes(texto)
+        );
+        renderizarTablaServicios(filtrados);
+    }
+
+    function mostrarFormularioServicio() { document.getElementById('form-servicio-box').style.display = 'block'; }
+    function ocultarFormularioServicio() { document.getElementById('form-servicio-box').style.display = 'none'; }
+
     function ejecutarCrearServicio() {
         const token = localStorage.getItem('token_jwt');
         const nombre = document.getElementById('srv-nombre').value;
@@ -891,21 +995,53 @@
         const idRuta = document.getElementById('srv-ruta').value;
         const idCliente = document.getElementById('srv-cliente').value;
 
-        if (!nombre || !direccion || !idRuta || !idCliente) { mostrarError('Nombre, Dirección, Recorrido y Cliente son obligatorios.'); return; }
+        // RECUPERAMOS LOS NUEVOS CAMPOS NUMÉRICOS
+        const latitud = parseFloat(document.getElementById('srv-latitud').value);
+        const longitud = parseFloat(document.getElementById('srv-longitud').value);
+
+        if (!nombre || !direccion || !idRuta || !idCliente || isNaN(latitud) || isNaN(longitud)) {
+            mostrarError('Nombre, Dirección, Latitud, Longitud, Recorrido y Cliente son obligatorios.');
+            return;
+        }
 
         fetch(`${API_URL}/servicios`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ nombre, direccion, prioridad, tipoResiduo, frecuencia, orden: 1, idRuta, idCliente })
+            // AGREGAMOS LATITUD Y LONGITUD AL PAQUETE
+            body: JSON.stringify({ nombre, direccion, prioridad, tipoResiduo, frecuencia, orden: 1, idRuta, idCliente, latitud, longitud })
         })
             .then(response => { if (!response.ok) throw new Error('Error al vincular la ubicación. Verifica los IDs provistos.'); return response.json(); })
             .then(data => {
                 mostrarExito(`¡Ubicación guardada y vinculada!`);
                 document.getElementById('srv-nombre').value = '';
                 document.getElementById('srv-direccion').value = '';
-                document.getElementById('srv-residuo').value = '';
+                document.getElementById('srv-latitud').value = '';
+                document.getElementById('srv-longitud').value = '';
+                document.getElementById('srv-residuo').selectedIndex = 0;
+                ocultarFormularioServicio();
+                cargarServicios();
+                cargarRutas();
             })
             .catch(err => mostrarError(err.message));
+    }
+
+    function eliminarServicio(id) {
+        Swal.fire({
+            title: '¿Eliminar ubicación?', text: "Se borrará permanentemente", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const token = localStorage.getItem('token_jwt');
+                fetch(`${API_URL}/servicios/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+                    .then(res => {
+                        if (!res.ok) throw new Error('No se pudo eliminar la ubicación.');
+                        mostrarExito('Ubicación eliminada.');
+                        cargarServicios();
+                        cargarRutas();
+                    }).catch(err => mostrarError(err.message));
+            }
+        });
     }
 
     // ==========================================
@@ -934,7 +1070,7 @@
                         <td>${u.email}</td>
                         <td><strong>${u.rol}</strong></td>
                         <td><span style="color: ${estadoColor}; font-weight: bold;">${estadoTexto}</span></td>
-                        <td style="text-align:center">
+                        <td style="text-align: center;">
                             <button class="btn-icono"
                                     onclick="editarUsuario(${u.id})"
                                     title="Editar">
@@ -956,20 +1092,43 @@
 
     function ejecutarCrearUsuario() {
         const token = localStorage.getItem('token_jwt');
-        const nombre = document.getElementById('new-nombre').value;
-        const apellido = document.getElementById('new-apellido').value;
-        const dni = document.getElementById('new-dni').value;
-        const email = document.getElementById('new-email').value;
+        const nombre = document.getElementById('new-nombre').value.trim();
+        const apellido = document.getElementById('new-apellido').value.trim();
+        const dni = document.getElementById('new-dni').value.trim();
+        const email = document.getElementById('new-email').value.trim();
         const rol = document.getElementById('new-rol').value;
 
-        if (!nombre || !apellido || !dni || !email) { mostrarError('Completá todos los campos.'); return; }
+        if (!nombre || !apellido || !dni || !email) {
+            mostrarError('Completá todos los campos.');
+            return;
+        }
+
+        // NUEVO: Validación rápida de formato de email en el frontend
+        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regexEmail.test(email)) {
+            mostrarError('El formato del email es inválido. Recordá incluir el @ y el dominio.');
+            return;
+        }
 
         fetch(`${API_URL}/usuarios`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ nombre, apellido, dni, email, rol })
         })
-            .then(response => { if (!response.ok) throw new Error('Error al guardar personal.'); return response.json(); })
+            .then(async response => {
+                if (!response.ok) {
+                    let mensajeError = "Error al guardar el personal.";
+                    try {
+                        const errorData = await response.json();
+                        mensajeError = errorData.message || mensajeError;
+                    } catch (e) {
+                        const errorText = await response.text();
+                        if (errorText) mensajeError = errorText;
+                    }
+                    throw new Error(mensajeError);
+                }
+                return response.json();
+            })
             .then(data => {
                 mostrarExito(`Usuario ${data.nombre} creado. Clave: ${data.dni.slice(-4)}`);
                 document.getElementById('new-nombre').value = '';
@@ -1002,7 +1161,6 @@
     }
 
     function editarUsuario(id) {
-
         const token = localStorage.getItem('token_jwt');
 
         fetch(`${API_URL}/usuarios/${id}`, {
@@ -1011,14 +1169,10 @@
             }
         })
             .then(res => {
-
-                if (!res.ok) {
-                    throw new Error("No tiene permisos para editar este usuario");
-                }
-
+                if (!res.ok) { throw new Error("No tiene permisos para editar este usuario"); }
                 return res.json();
-            })            .then(usuario => {
-
+            })
+            .then(usuario => {
                 Swal.fire({
                     title: 'Editar Usuario',
                     html: `
@@ -1041,7 +1195,6 @@
                         };
                     }
                 }).then(result => {
-
                     if (!result.isConfirmed) return;
 
                     fetch(`${API_URL}/usuarios/${id}`, {
@@ -1053,39 +1206,17 @@
                         body: JSON.stringify(result.value)
                     })
                         .then(res => {
-                            if (!res.ok) {
-                                throw new Error('No se pudo actualizar');
-                            }
-
-                            Swal.fire(
-                                'Actualizado',
-                                'Usuario actualizado correctamente',
-                                'success'
-                            );
-
+                            if (!res.ok) { throw new Error('No se pudo actualizar'); }
+                            Swal.fire('Actualizado', 'Usuario actualizado correctamente', 'success');
                             cargarUsuarios();
                         })
-                        .catch(err => {
-                            Swal.fire(
-                                'Error',
-                                err.message,
-                                'error'
-                            );
-                        });
-
+                        .catch(err => { Swal.fire('Error', err.message, 'error'); });
                 });
-
             })
-            .catch(err => {
-                Swal.fire(
-                    'Error',
-                    err.message,
-                    'error'
-                );
-            });
+            .catch(err => { Swal.fire('Error', err.message, 'error'); });
     }
-    async function buscarUsuarioPorDni() {
 
+    async function buscarUsuarioPorDni() {
         const token = localStorage.getItem('token_jwt');
         const dni = document.getElementById("buscar-dni").value.trim();
 
@@ -1095,19 +1226,12 @@
         }
 
         try {
-
             const response = await fetch(
                 `${API_URL}/usuarios/dni/${dni}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            if (!response.ok) {
-                throw new Error("No existe un usuario con ese DNI");
-            }
+            if (!response.ok) { throw new Error("No existe un usuario con ese DNI"); }
 
             const usuario = await response.json();
 
@@ -1121,29 +1245,14 @@
                 <td>${usuario.rol}</td>
                 <td>${usuario.activo ? 'Activo' : 'Inactivo'}</td>
                 <td style="text-align:center;">
-                    <button class="btn-icono"
-                            onclick="editarUsuario(${usuario.id})"
-                            title="Editar">
-                        ✏️
-                    </button>
-
-                    <button class="btn-icono btn-icono-rojo"
-                            onclick="desactivarUsuario(${usuario.id})"
-                            title="Desactivar">
-                        🗑️
-                    </button>
+                    <button class="btn-icono" onclick="editarUsuario(${usuario.id})" title="Editar">✏️</button>
+                    <button class="btn-icono btn-icono-rojo" onclick="desactivarUsuario(${usuario.id})" title="Desactivar">🗑️</button>
             </td>
             </tr>
         `;
 
         } catch (error) {
-
-            Swal.fire(
-                "No encontrado",
-                error.message,
-                "error"
-            );
-
+            Swal.fire("No encontrado", error.message, "error");
         }
     }
 
