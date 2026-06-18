@@ -55,7 +55,6 @@ public class CamionService {
         camionExistente.setTipo(datosNuevos.getTipo());
         camionExistente.setEstadoCamion(datosNuevos.getEstadoCamion());
         camionExistente.setCapacidadCarga(datosNuevos.getCapacidadCarga());
-        camionExistente.setConsumoDieselPorKm(datosNuevos.getConsumoDieselPorKm());
 
         return mapearToDto(camionRepository.save(camionExistente));
     }
@@ -103,7 +102,6 @@ public class CamionService {
                 .tipo(dto.getTipo())
                 .estadoCamion(dto.getEstadoCamion())
                 .capacidadCarga(dto.getCapacidadCarga())
-                .consumoDieselPorKm(dto.getConsumoDieselPorKm())
                 .build();
     }
 }
