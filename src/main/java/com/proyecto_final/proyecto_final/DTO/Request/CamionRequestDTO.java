@@ -34,8 +34,4 @@ public class CamionRequestDTO {
     @NotNull(message = "La capacidad de carga es obligatoria")
     @Positive(message = "La capacidad de carga debe ser mayor a 0")
     private Double capacidadCarga;
-
-    @NotNull(message = "El consumo de diésel es obligatorio")
-    @Positive(message = "El consumo de diésel debe ser mayor a 0")
-    private Double consumoDieselPorKm;
 }
