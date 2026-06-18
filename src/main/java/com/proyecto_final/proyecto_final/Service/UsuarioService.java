@@ -8,6 +8,9 @@ import com.proyecto_final.proyecto_final.Repository.UsuarioRepository;
 import com.proyecto_final.proyecto_final.Excepcion.UsuarioDesactivadoException;
 import lombok.*;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
@@ -18,6 +21,8 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
 
     public Usuario crearUsuario(UsuarioRequestDTO dto) {
+        // Validación de rol
+        validarCreacionPorRol(dto.getRol());
         // Validar email duplicado
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Ya existe un usuario con ese email");
@@ -49,8 +54,11 @@ public class UsuarioService {
     }
 
     public Usuario buscarPorId(int id) {
-        return usuarioRepository.findById((long) id)
+        Usuario usuario = usuarioRepository.findById((long) id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
+        // Validacion
+        validarPermisoSobreUsuario(usuario);
+        return usuario;
     }
 
     public Usuario buscarPorEmail(String email) {
@@ -115,5 +123,27 @@ public class UsuarioService {
                 .rol(u.getRol().name())
                 .activo(u.isActivo())
                 .build();
+    }
+
+    // Validar que OFICINA no pueda administrar usuarios ADMIN
+    private void validarPermisoSobreUsuario(Usuario usuarioObjetivo) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String rolActual = auth.getAuthorities().iterator().next().getAuthority();
+
+        if (rolActual.equals("ROLE_OFICINA") && usuarioObjetivo.getRol() == Rol.ADMIN) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "No tenés permisos para administrar usuarios ADMIN.");
+        }
+    }
+
+    // Validar que OFICINA no pueda crear usuarios ADMIN
+    private void validarCreacionPorRol(Rol rolNuevoUsuario) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String rolActual = auth.getAuthorities().iterator().next().getAuthority();
+
+        if (rolActual.equals("ROLE_OFICINA") && rolNuevoUsuario == Rol.ADMIN) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "No tenés permisos para crear usuarios ADMIN.");
+        }
     }
 }
