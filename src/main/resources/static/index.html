@@ -253,7 +253,9 @@
             </div>
 
             <div id="form-servicio-box" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
-                <h4 style="margin-top: 0; color: #333;">Nueva Ubicación de Recolección</h4>
+                <h4 id="titulo-form-servicio" style="margin-top: 0; color: #333;">Nueva Ubicación de Recolección</h4>
+                <input type="hidden" id="srv-id">
+
                 <div class="form-group">
                     <label>Nombre del Punto:</label>
                     <input type="text" id="srv-nombre" placeholder="Ej: Manolo Sucursal Alem">
@@ -347,7 +349,8 @@
 
         <div id="vista-rutas" class="vista-contenido vista-activa">
             <div class="admin-element" style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #e0e0e0;">
-                <h4 style="margin-top: 0; color: #333; font-size: 15px;">➕ Registrar Nuevo Recorrido</h4>
+                <h4 id="titulo-form-ruta" style="margin-top: 0; color: #333; font-size: 15px;">➕ Registrar Nuevo Recorrido</h4>
+                <input type="hidden" id="rec-id">
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 5px;">
                     <div style="flex: 1; min-width: 100px;">
                         <label style="font-size: 12px; color: #555;">Código:</label>
@@ -368,7 +371,10 @@
                         </select>
                     </div>
                 </div>
-                <button class="btn-success" onclick="ejecutarCrearRecorrido()" style="padding: 8px 15px; font-size: 13px; width: auto; margin-top: 5px;">Guardar Recorrido</button>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn-success" onclick="ejecutarCrearRecorrido()" style="padding: 8px 15px; font-size: 13px; width: auto;">Guardar Recorrido</button>
+                    <button class="btn-danger" id="btn-cancelar-rec" style="padding: 8px 15px; font-size: 13px; width: auto; display: none;" onclick="cancelarEdicionRecorrido()">Cancelar</button>
+                </div>
             </div>
 
             <h3 style="margin-top: 0; color: #333;">Mis Recorridos Asignados</h3>
@@ -384,7 +390,8 @@
             </div>
 
             <div id="form-camion-box" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
-                <h4 style="margin-top: 0; color: #333;">Registrar Nuevo Camión</h4>
+                <h4 id="titulo-form-camion" style="margin-top: 0; color: #333;">Registrar Nuevo Camión</h4>
+                <input type="hidden" id="cam-id">
                 <div class="form-group">
                     <label>Patente / Dominio:</label>
                     <input type="text" id="cam-patente" placeholder="Ej: AF123CD">
@@ -533,6 +540,8 @@
 <script>
     const API_URL = 'http://localhost:8080/api';
     let listaServiciosGlobal = [];
+    let listaRutasGlobal = [];
+    let listaCamionesGlobal = [];
 
     // SWEET ALERT WRAPPERS
     function mostrarExito(mensaje) { Swal.fire({ title: '¡Éxito!', text: mensaje, icon: 'success', confirmButtonColor: '#17a2b8' }); }
@@ -618,6 +627,9 @@
         if (pestania === 'servicios') cargarServicios();
     }
 
+    // ==========================================
+    // CARGA DINÁMICA DE SELECTS
+    // ==========================================
     function cargarOpcionesDesplegables() {
         const token = localStorage.getItem('token_jwt');
 
@@ -667,6 +679,7 @@
             .then(response => { if (!response.ok) throw new Error('Sin permisos.'); return response.json(); })
             .then(data => {
                 if (!Array.isArray(data)) throw new Error('Formato de datos incorrecto');
+                listaRutasGlobal = data; // Guardamos para poder editar después
                 if (data.length === 0) {
                     boxRutas.innerHTML = `<p style="color: #666;">No hay recorridos registrados.</p>`;
                     return;
@@ -677,7 +690,10 @@
                     <div class="tarjeta-ruta">
                         <div class="tarjeta-ruta-header">
                             <h4>🚚 Recorrido: ${ruta.nombre}</h4>
-                            <button class="btn-icono btn-icono-rojo" title="Eliminar Recorrido" onclick="eliminarRuta(${ruta.idRuta || ruta.id})">🗑️</button>
+                            <div style="display:flex; gap:5px;">
+                                <button class="btn-icono" title="Editar" onclick="prepararEdicionRuta(${ruta.idRuta || ruta.id})">✏️</button>
+                                <button class="btn-icono btn-icono-rojo" title="Eliminar Recorrido" onclick="eliminarRuta(${ruta.idRuta || ruta.id})">🗑️</button>
+                            </div>
                         </div>
                         <p><strong>Detalle:</strong> ${ruta.descripcion}</p>
                         <p><strong>Fecha:</strong> ${ruta.fecha || 'Sin fecha'}</p>
@@ -705,8 +721,36 @@
             .catch(err => { boxRutas.innerHTML = `<p class="error">${err.message}</p>`; });
     }
 
+    function prepararEdicionRuta(id) {
+        const ruta = listaRutasGlobal.find(r => (r.idRuta || r.id) == id);
+        if (!ruta) return;
+
+        document.getElementById('titulo-form-ruta').innerText = 'Editar Recorrido';
+        document.getElementById('rec-id').value = ruta.idRuta || ruta.id;
+        document.getElementById('rec-nombre').value = ruta.nombre;
+        document.getElementById('rec-descripcion').value = ruta.descripcion;
+        document.getElementById('rec-fecha').value = ruta.fecha || '';
+
+        // El id del chofer puede venir directo o adentro del objeto chofer
+        document.getElementById('rec-chofer').value = ruta.idChofer || (ruta.chofer ? ruta.chofer.id : '');
+
+        document.getElementById('btn-cancelar-rec').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    function cancelarEdicionRecorrido() {
+        document.getElementById('titulo-form-ruta').innerText = '➕ Registrar Nuevo Recorrido';
+        document.getElementById('rec-id').value = '';
+        document.getElementById('rec-nombre').value = '';
+        document.getElementById('rec-descripcion').value = '';
+        document.getElementById('rec-fecha').value = '';
+        document.getElementById('rec-chofer').value = '';
+        document.getElementById('btn-cancelar-rec').style.display = 'none';
+    }
+
     function ejecutarCrearRecorrido() {
         const token = localStorage.getItem('token_jwt');
+        const id = document.getElementById('rec-id').value;
         const nombre = document.getElementById('rec-nombre').value;
         const descripcion = document.getElementById('rec-descripcion').value;
         const fecha = document.getElementById('rec-fecha').value;
@@ -717,18 +761,18 @@
         const bodyData = { nombre, descripcion, fecha };
         if (idChofer) bodyData.idChofer = parseInt(idChofer);
 
-        fetch(`${API_URL}/rutas`, {
-            method: 'POST',
+        const metodo = id ? 'PUT' : 'POST';
+        const url = id ? `${API_URL}/rutas/${id}` : `${API_URL}/rutas`;
+
+        fetch(url, {
+            method: metodo,
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(bodyData)
         })
-            .then(r => { if (!r.ok) throw new Error('Error al crear el recorrido'); return r.json(); })
+            .then(r => { if (!r.ok) throw new Error('Error al guardar el recorrido'); return r.json(); })
             .then(data => {
-                mostrarExito(`¡Recorrido "${data.nombre}" registrado!`);
-                document.getElementById('rec-nombre').value = '';
-                document.getElementById('rec-descripcion').value = '';
-                document.getElementById('rec-fecha').value = '';
-                document.getElementById('rec-chofer').value = '';
+                mostrarExito(id ? `¡Recorrido actualizado!` : `¡Recorrido "${data.nombre}" registrado!`);
+                cancelarEdicionRecorrido();
                 cargarRutas();
                 cargarOpcionesDesplegables();
             }).catch(err => mostrarError(err.message));
@@ -792,7 +836,10 @@
         document.getElementById('cli-cuit').value = '';
     }
 
-    function ocultarFormularioCliente() { document.getElementById('form-cliente-box').style.display = 'none'; }
+    function ocultarFormularioCliente() {
+        document.getElementById('form-cliente-box').style.display = 'none';
+        document.getElementById('cli-id').value = '';
+    }
 
     function prepararEdicionCliente(id, razon, cuit) {
         document.getElementById('form-cliente-box').style.display = 'block';
@@ -860,6 +907,7 @@
             .then(res => res.json())
             .then(data => {
                 if (!Array.isArray(data)) throw new Error('Formato inválido de camiones');
+                listaCamionesGlobal = data; // Guardamos para poder editar
                 if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay camiones registrados.</td></tr>'; return; }
                 let filas = '';
                 data.forEach(cam => {
@@ -872,6 +920,7 @@
                     <td><span style="color: ${colorEstado}; font-weight: bold;">${estadoReal.replace('_', ' ')}</span></td>
                     <td>${cam.capacidadCarga} kg</td>
                     <td style="text-align: center;">
+                       <button class="btn-icono" title="Editar" onclick="prepararEdicionCamion('${cam.id || cam.patente}')">✏️</button>
                        <button class="btn-icono btn-icono-rojo" title="Eliminar" onclick="eliminarCamion(${cam.id || `'${cam.patente}'`})">🗑️</button>
                     </td>
                 </tr>`;
@@ -881,11 +930,33 @@
             .catch(err => { tbody.innerHTML = `<tr><td colspan="5" class="error">Error: ${err.message}</td></tr>`; });
     }
 
-    function mostrarFormularioCamion() { document.getElementById('form-camion-box').style.display = 'block'; }
-    function ocultarFormularioCamion() { document.getElementById('form-camion-box').style.display = 'none'; }
+    function mostrarFormularioCamion() {
+        document.getElementById('form-camion-box').style.display = 'block';
+        document.getElementById('titulo-form-camion').innerText = 'Registrar Nuevo Camión';
+    }
+
+    function ocultarFormularioCamion() {
+        document.getElementById('form-camion-box').style.display = 'none';
+        document.getElementById('cam-id').value = '';
+    }
+
+    function prepararEdicionCamion(idOrPatente) {
+        const cam = listaCamionesGlobal.find(c => c.id == idOrPatente || c.patente == idOrPatente);
+        if (!cam) return;
+
+        document.getElementById('form-camion-box').style.display = 'block';
+        document.getElementById('titulo-form-camion').innerText = 'Editar Camión';
+        document.getElementById('cam-id').value = cam.id || cam.patente;
+        document.getElementById('cam-patente').value = cam.patente;
+        document.getElementById('cam-tipo').value = cam.tipo;
+        document.getElementById('cam-estado').value = cam.estado || cam.estadoCamion || 'DISPONIBLE';
+        document.getElementById('cam-capacidad').value = cam.capacidadCarga;
+        window.scrollTo(0, 0);
+    }
 
     function ejecutarCrearCamion() {
         const token = localStorage.getItem('token_jwt');
+        const id = document.getElementById('cam-id').value;
         const patente = document.getElementById('cam-patente').value;
         const tipo = document.getElementById('cam-tipo').value;
         const estadoCamion = document.getElementById('cam-estado').value;
@@ -898,17 +969,20 @@
             return;
         }
 
-        fetch(`${API_URL}/camiones`, {
-            method: 'POST',
+        const metodo = id ? 'PUT' : 'POST';
+        const url = id ? `${API_URL}/camiones/${id}` : `${API_URL}/camiones`;
+
+        fetch(url, {
+            method: metodo,
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ patente, tipo, estadoCamion, capacidadCarga, consumoDieselPorKm })
         })
             .then(response => {
-                if (!response.ok) throw new Error('Error al registrar camión. Revisá la consola.');
+                if (!response.ok) throw new Error('Error al guardar camión. Revisá la consola.');
                 return response.json();
             })
             .then(data => {
-                mostrarExito(`¡Camión ${data.patente || patente} guardado!`);
+                mostrarExito(id ? `¡Camión actualizado!` : `¡Camión guardado!`);
                 document.getElementById('cam-patente').value = '';
                 document.getElementById('cam-tipo').selectedIndex = 0;
                 document.getElementById('cam-capacidad').value = '';
@@ -966,6 +1040,7 @@
                 <td>${srv.prioridad}</td>
                 <td>${srv.tipoResiduo}</td>
                 <td style="text-align: center;">
+                    <button class="btn-icono" title="Editar" onclick="prepararEdicionServicio(${srv.id})">✏️</button>
                     <button class="btn-icono btn-icono-rojo" title="Eliminar" onclick="eliminarServicio(${srv.id})">🗑️</button>
                 </td>
             </tr>`;
@@ -982,11 +1057,41 @@
         renderizarTablaServicios(filtrados);
     }
 
-    function mostrarFormularioServicio() { document.getElementById('form-servicio-box').style.display = 'block'; }
-    function ocultarFormularioServicio() { document.getElementById('form-servicio-box').style.display = 'none'; }
+    function mostrarFormularioServicio() {
+        document.getElementById('form-servicio-box').style.display = 'block';
+        document.getElementById('titulo-form-servicio').innerText = 'Nueva Ubicación de Recolección';
+    }
+
+    function ocultarFormularioServicio() {
+        document.getElementById('form-servicio-box').style.display = 'none';
+        document.getElementById('srv-id').value = '';
+    }
+
+    function prepararEdicionServicio(id) {
+        const srv = listaServiciosGlobal.find(s => s.id == id);
+        if (!srv) return;
+
+        document.getElementById('form-servicio-box').style.display = 'block';
+        document.getElementById('titulo-form-servicio').innerText = `Editar Ubicación #${srv.id}`;
+
+        document.getElementById('srv-id').value = srv.id;
+        document.getElementById('srv-nombre').value = srv.nombre;
+        document.getElementById('srv-direccion').value = srv.direccion;
+        document.getElementById('srv-latitud').value = srv.latitud || '';
+        document.getElementById('srv-longitud').value = srv.longitud || '';
+        document.getElementById('srv-prioridad').value = srv.prioridad;
+        document.getElementById('srv-residuo').value = srv.tipoResiduo;
+        document.getElementById('srv-frecuencia').value = srv.frecuencia;
+
+        document.getElementById('srv-ruta').value = srv.idRuta || (srv.ruta ? (srv.ruta.idRuta || srv.ruta.id) : '');
+        document.getElementById('srv-cliente').value = srv.idCliente || (srv.cliente ? srv.cliente.id : '');
+
+        window.scrollTo(0, 0);
+    }
 
     function ejecutarCrearServicio() {
         const token = localStorage.getItem('token_jwt');
+        const id = document.getElementById('srv-id').value;
         const nombre = document.getElementById('srv-nombre').value;
         const direccion = document.getElementById('srv-direccion').value;
         const prioridad = document.getElementById('srv-prioridad').value;
@@ -1004,15 +1109,17 @@
             return;
         }
 
-        fetch(`${API_URL}/servicios`, {
-            method: 'POST',
+        const metodo = id ? 'PUT' : 'POST';
+        const url = id ? `${API_URL}/servicios/${id}` : `${API_URL}/servicios`;
+
+        fetch(url, {
+            method: metodo,
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            // AGREGAMOS LATITUD Y LONGITUD AL PAQUETE
             body: JSON.stringify({ nombre, direccion, prioridad, tipoResiduo, frecuencia, orden: 1, idRuta, idCliente, latitud, longitud })
         })
-            .then(response => { if (!response.ok) throw new Error('Error al vincular la ubicación. Verifica los IDs provistos.'); return response.json(); })
+            .then(response => { if (!response.ok) throw new Error('Error al guardar la ubicación.'); return response.json(); })
             .then(data => {
-                mostrarExito(`¡Ubicación guardada y vinculada!`);
+                mostrarExito(id ? `¡Ubicación actualizada!` : `¡Ubicación guardada y vinculada!`);
                 document.getElementById('srv-nombre').value = '';
                 document.getElementById('srv-direccion').value = '';
                 document.getElementById('srv-latitud').value = '';
@@ -1103,7 +1210,6 @@
             return;
         }
 
-        // NUEVO: Validación rápida de formato de email en el frontend
         const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!regexEmail.test(email)) {
             mostrarError('El formato del email es inválido. Recordá incluir el @ y el dominio.');
