@@ -34,8 +34,9 @@ public class SecurityConfig {
                                 // Permitimos peticiones previas de seguridad (CORS)
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                                // Dejamos el HTML y estáticos libres para que cargue la web
-                                .requestMatchers("/", "/index.html").permitAll()
+                                // /error es la página interna a la que Spring reenvía los errores no manejados.
+                                // Si no está permitida, Spring Security la bloquea y todo error llega como 403.
+                                .requestMatchers("/", "/index.html", "/error").permitAll()
 
                                 // Dejamos Login libre para que todos puedan iniciar sesión
                                 .requestMatchers("/api/auth/**").permitAll()
