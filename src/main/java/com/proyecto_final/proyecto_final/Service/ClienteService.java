@@ -6,8 +6,9 @@ import com.proyecto_final.proyecto_final.Model.Cliente;
 import com.proyecto_final.proyecto_final.Repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoDuplicadoException;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoNoEncontradoException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +23,10 @@ public class ClienteService {
 
         //Validaciones
         if (clienteRepository.existsByCuit(cliente.getCuit())) {
-            throw new RuntimeException("Ya existe un cliente registrado con el CUIT: " + cliente.getCuit());
+            throw new RecursoDuplicadoException("Ya existe un cliente registrado con el CUIT: " + cliente.getCuit());
         }
         if (clienteRepository.existsByRazonSocial(cliente.getRazonSocial())) {
-            throw new RuntimeException("Ya existe un cliente registrado con la Razón Social: " + cliente.getRazonSocial());
+            throw new RecursoDuplicadoException("Ya existe un cliente registrado con la Razón Social: " + cliente.getRazonSocial());
         }
 
         return mapearToDTO(clienteRepository.save(cliente));
@@ -39,12 +40,12 @@ public class ClienteService {
 
     public Cliente buscarPorId(Long id) {
         return clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con el ID: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado con el ID: " + id));
     }
 
     public Cliente buscarPorCuit(String cuit) {
         return clienteRepository.findByCuit(cuit)
-                .orElseThrow(() -> new RuntimeException("No se encontró ningún cliente con el CUIT: " + cuit));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró ningún cliente con el CUIT: " + cuit));
     }
 
     public ClienteResponseDTO actualizarCliente(Long id, ClienteRequestDTO datosNuevos) {

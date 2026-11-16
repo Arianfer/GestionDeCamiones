@@ -6,9 +6,11 @@ import com.proyecto_final.proyecto_final.Repository.RutaRepository;
 import com.proyecto_final.proyecto_final.Excepcion.RutaNoHalladaException;
 import lombok.*;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoDuplicadoException;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoNoEncontradoException;
+import com.proyecto_final.proyecto_final.Excepcion.ReglaDeNegocioException;
 
 @Service
 @RequiredArgsConstructor
@@ -20,16 +22,16 @@ public class RutaService {
     public Ruta crearRuta(Ruta ruta) {
         // Validaciones
         if (rutaRepository.findByNombre(ruta.getNombre()).isPresent()) {
-            throw new RuntimeException("Ya existe una ruta con el nombre: " + ruta.getNombre());
+            throw new RecursoDuplicadoException("Ya existe una ruta con el nombre: " + ruta.getNombre());
         }
 
         if (ruta.getChofer() == null || ruta.getChofer().getId() == null) {
-            throw new RuntimeException("La ruta debe tener un empleado asignado obligatoriamente.");
+            throw new ReglaDeNegocioException("La ruta debe tener un empleado asignado obligatoriamente.");
         }
 
         Usuario chofer = usuarioService.buscarPorId(ruta.getChofer().getId().intValue());
         if (!chofer.getRol().name().equals("EMPLEADO")) {
-            throw new RuntimeException("Error: El usuario asignado a la ruta no es un Chofer (EMPLEADO).");
+            throw new ReglaDeNegocioException("Error: El usuario asignado a la ruta no es un Chofer (EMPLEADO).");
         }
         ruta.setChofer(chofer);
 
@@ -47,12 +49,12 @@ public class RutaService {
 
     public Ruta buscarPorId(Long id) {
         return rutaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ruta no encontrada con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Ruta no encontrada con id: " + id));
     }
 
     public Ruta buscarPorNombre(String nombre) {
         return rutaRepository.findByNombre(nombre)
-                .orElseThrow(() -> new RuntimeException("Ruta no encontrada con nombre: " + nombre));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Ruta no encontrada con nombre: " + nombre));
     }
 
     public Ruta actualizarRuta(Long id, Ruta datosNuevos) {
@@ -70,7 +72,7 @@ public class RutaService {
         if (datosNuevos.getChofer() != null && datosNuevos.getChofer().getId() != null) {
             Usuario nuevoChofer = usuarioService.buscarPorId(datosNuevos.getChofer().getId().intValue());
             if (!nuevoChofer.getRol().name().equals("EMPLEADO")) {
-                throw new RuntimeException("Error: El usuario asignado no es un Chofer (EMPLEADO).");
+                throw new ReglaDeNegocioException("Error: El usuario asignado no es un Chofer (EMPLEADO).");
             }
             rutaExistente.setChofer(nuevoChofer);
         }

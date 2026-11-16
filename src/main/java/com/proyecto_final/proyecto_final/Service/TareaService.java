@@ -17,9 +17,9 @@ import com.proyecto_final.proyecto_final.Excepcion.TareaNoEncontradaException;
 import com.proyecto_final.proyecto_final.Excepcion.UsuarioDesactivadoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.Comparator;
 import java.util.List;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoNoEncontradoException;
 
 @Service
 @RequiredArgsConstructor
@@ -35,13 +35,13 @@ public class TareaService {
 
         //Reviso que todas las entidades existan
         Camion camion = camionRepository.findById(dto.getIdCamion())
-                .orElseThrow(() -> new CamionNoDisponibleException("Camión no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Camión no encontrado"));
 
         Ruta ruta = rutaRepository.findById(dto.getIdRuta())
                 .orElseThrow(() -> new RutaNoHalladaException("Ruta no encontrada"));
 
         Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
-                .orElseThrow(() -> new UsuarioDesactivadoException("Usuario no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
 
         // Valido que el camión esté disponible
         if (camion.getEstadoCamion() != EstadoCamion.DISPONIBLE) {
