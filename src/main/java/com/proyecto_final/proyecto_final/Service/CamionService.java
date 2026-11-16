@@ -8,8 +8,9 @@ import com.proyecto_final.proyecto_final.Repository.CamionRepository;
 import com.proyecto_final.proyecto_final.Excepcion.PatenteInvalidaException;
 import lombok.*;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoDuplicadoException;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoNoEncontradoException;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class CamionService {
     public CamionResponseDTO crearCamion(CamionRequestDTO camionDto) {
 
         if (camionRepository.findByPatente(camionDto.getPatente()).isPresent()) {
-            throw new PatenteInvalidaException("Ya existe un camión registrado con la patente: " + camionDto.getPatente());
+            throw new RecursoDuplicadoException("Ya existe un camión registrado con la patente: " + camionDto.getPatente());
         }
 
         Camion camion = mapearToEntidad(camionDto);
@@ -34,12 +35,12 @@ public class CamionService {
 
     public Camion buscarPorId(Long id) {
         return camionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Camion no encontrado con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Camion no encontrado con id: " + id));
     }
 
     public Camion buscarPorPatente(String patente) {
         return camionRepository.findByPatente(patente)
-                .orElseThrow(() -> new RuntimeException("Camion no encontrado con patente: " + patente));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Camion no encontrado con patente: " + patente));
     }
 
     public Camion actualizarEstado(Long id, EstadoCamion nuevoEstado) {
@@ -69,7 +70,7 @@ public class CamionService {
     public Double calcularCostoViaje(Long id, Double km) {
         // Buscamos el camión por ID usando el repository si no existe, lanzamos una excepción
         Camion camion = camionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Camión no encontrado con el ID: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Camión no encontrado con el ID: " + id));
 
         // Definimos el precio del Diesel. Ej el precio promedio actual en estaciones de servicio
         Double precioDiesel = 1100.0;

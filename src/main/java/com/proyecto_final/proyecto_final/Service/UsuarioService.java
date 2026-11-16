@@ -11,8 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.access.AccessDeniedException;
-
 import java.util.List;
+import com.proyecto_final.proyecto_final.Excepcion.CredencialesInvalidasException;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoDuplicadoException;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoNoEncontradoException;
+import com.proyecto_final.proyecto_final.Excepcion.ReglaDeNegocioException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,15 +28,15 @@ public class UsuarioService {
         validarCreacionPorRol(dto.getRol());
         // Validar email duplicado
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Ya existe un usuario con ese email");
+            throw new RecursoDuplicadoException("Ya existe un usuario con ese email");
         }
         // Validar DNI duplicado
         if (usuarioRepository.existsByDni(dto.getDni())) {
-            throw new RuntimeException("Ya existe un usuario con ese DNI");
+            throw new RecursoDuplicadoException("Ya existe un usuario con ese DNI");
         }
         // Validar largo del DNI
         if (dto.getDni() == null || dto.getDni().length() < 4) {
-            throw new RuntimeException("El DNI debe tener al menos 4 números.");
+            throw new ReglaDeNegocioException("El DNI debe tener al menos 4 números.");
         }
 
         Usuario usuario = Usuario.builder()
@@ -55,7 +58,7 @@ public class UsuarioService {
 
     public Usuario buscarPorId(int id) {
         Usuario usuario = usuarioRepository.findById((long) id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado con id: " + id));
         // Validacion
         validarPermisoSobreUsuario(usuario);
         return usuario;
@@ -63,7 +66,7 @@ public class UsuarioService {
 
     public Usuario buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado con email: " + email));
     }
 
     public List<Usuario> listarPorRol(Rol rol) {
@@ -75,23 +78,25 @@ public class UsuarioService {
 
         Usuario usuario = usuarioRepository.findByDni(dni)
                 .orElseThrow(() ->
-                        new RuntimeException("Usuario no encontrado con DNI: " + dni));
+                        new RecursoNoEncontradoException("Usuario no encontrado con DNI: " + dni));
 
         validarPermisoSobreUsuario(usuario);
 
         return usuario;
     }
 
-    // Autenticación cambiada para que pida el DNI en vez del Email
+    // Login por DNI. Si el DNI no existe o la contraseña no coincide, se responde
+    // el mismo mensaje: así no se revela qué DNIs están registrados.
     public Usuario autenticar(String dni, String password) {
-        Usuario usuario = buscarPorDni(dni);
+        Usuario usuario = usuarioRepository.findByDni(dni)
+                .orElseThrow(() -> new CredencialesInvalidasException("DNI o contraseña incorrectos"));
+
+        if (!usuario.getPassword().equals(password)) {
+            throw new CredencialesInvalidasException("DNI o contraseña incorrectos");
+        }
 
         if (!usuario.isActivo()) {
             throw new UsuarioDesactivadoException("El usuario se encuentra inactivo en el sistema de Ciageser");
-        }
-
-        if (!usuario.getPassword().equals(password)) {
-            throw new RuntimeException("Credenciales invalidas");
         }
 
         return usuario;

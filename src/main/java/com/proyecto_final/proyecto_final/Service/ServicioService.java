@@ -8,8 +8,9 @@ import com.proyecto_final.proyecto_final.Repository.ClienteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import com.proyecto_final.proyecto_final.Excepcion.RecursoNoEncontradoException;
+import com.proyecto_final.proyecto_final.Excepcion.ReglaDeNegocioException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,16 +25,16 @@ public class ServicioService {
         if (servicio.getRuta() != null) {
             Long rutaId = servicio.getRuta().getIdRuta();
             rutaRepository.findById(rutaId)
-                    .orElseThrow(() -> new RuntimeException("La ruta especificada no existe"));
+                    .orElseThrow(() -> new RecursoNoEncontradoException("La ruta especificada no existe"));
         } else {
-            throw new RuntimeException("El servicio debe estar asignado a una ruta");
+            throw new ReglaDeNegocioException("El servicio debe estar asignado a una ruta");
         }
         // Validacion cliente
         if (servicio.getCliente() != null && servicio.getCliente().getId() != null) {
             clienteRepository.findById(servicio.getCliente().getId())
-                    .orElseThrow(() -> new RuntimeException("El cliente asociado no existe"));
+                    .orElseThrow(() -> new RecursoNoEncontradoException("El cliente asociado no existe"));
         } else {
-            throw new RuntimeException("El servicio debe estar asociado a un cliente obligatorio");
+            throw new ReglaDeNegocioException("El servicio debe estar asociado a un cliente obligatorio");
         }
 
         return servicioRepository.save(servicio);
@@ -45,7 +46,7 @@ public class ServicioService {
 
     public Servicio buscarPorId(Long id) {
         return servicioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Servicio no encontrado con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Servicio no encontrado con id: " + id));
     }
 
     public Servicio actualizarServicio(Long id, Servicio datosNuevos) {
@@ -62,7 +63,8 @@ public class ServicioService {
 
         if (datosNuevos.getRuta() != null) {
             Long nuevaRutaId = (long) datosNuevos.getRuta().getIdRuta();
-            servicioExistente.setRuta(rutaRepository.findById(nuevaRutaId).orElseThrow());
+            servicioExistente.setRuta(rutaRepository.findById(nuevaRutaId)
+                    .orElseThrow(() -> new RecursoNoEncontradoException("La ruta especificada no existe")));
         }
 
         return servicioRepository.save(servicioExistente);
