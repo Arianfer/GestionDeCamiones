@@ -13,6 +13,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     boolean existsByEmail(String email);
     boolean existsByDni(String dni);
+    // Para validar duplicados al editar: busca otro usuario (id distinto) con el mismo dato
+    boolean existsByEmailAndIdNot(String email, Long id);
+    boolean existsByDniAndIdNot(String dni, Long id);
     Optional<Usuario> findByEmail(String email);
     Optional<Usuario> findByDni(String dni);
     List<Usuario> findByRol(Rol rol);

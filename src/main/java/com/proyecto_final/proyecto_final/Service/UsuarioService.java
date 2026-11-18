@@ -106,6 +106,21 @@ public class UsuarioService {
     public Usuario actualizarUsuario(int id, UsuarioRequestDTO dto) {
         Usuario usuarioExistente = buscarPorId(id);
 
+        // OFICINA no puede convertir a un usuario en ADMIN (misma regla que al crear)
+        validarCreacionPorRol(dto.getRol());
+        // Validar email duplicado en OTRO usuario (el propio puede conservar su email)
+        if (usuarioRepository.existsByEmailAndIdNot(dto.getEmail(), usuarioExistente.getId())) {
+            throw new RecursoDuplicadoException("Ya existe un usuario con ese email");
+        }
+        // Validar DNI duplicado en OTRO usuario
+        if (usuarioRepository.existsByDniAndIdNot(dto.getDni(), usuarioExistente.getId())) {
+            throw new RecursoDuplicadoException("Ya existe un usuario con ese DNI");
+        }
+        // Validar largo del DNI
+        if (dto.getDni() == null || dto.getDni().length() < 4) {
+            throw new ReglaDeNegocioException("El DNI debe tener al menos 4 números.");
+        }
+
         // Actualizamos solo los campos que vienen en el DTO
         usuarioExistente.setNombre(dto.getNombre());
         usuarioExistente.setApellido(dto.getApellido());
