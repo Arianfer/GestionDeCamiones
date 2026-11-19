@@ -14,7 +14,6 @@ import com.proyecto_final.proyecto_final.Repository.UsuarioRepository;
 import com.proyecto_final.proyecto_final.Excepcion.CamionNoDisponibleException;
 import com.proyecto_final.proyecto_final.Excepcion.RutaNoHalladaException;
 import com.proyecto_final.proyecto_final.Excepcion.TareaNoEncontradaException;
-import com.proyecto_final.proyecto_final.Excepcion.UsuarioDesactivadoException;
 import com.proyecto_final.proyecto_final.Enums.Rol;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -36,7 +35,7 @@ public class TareaService {
 
     public TareaResponseDTO crearTarea(TareaRequestDTO dto) {
 
-        //Reviso que todas las entidades existan
+        // Reviso que todas las entidades existan
         Camion camion = camionRepository.findById(dto.getIdCamion())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Camión no encontrado"));
 
@@ -84,7 +83,7 @@ public class TareaService {
         return tareaToDto(tarea);
     }
 
-    //Tareas Activas por Chofer
+    // Tareas del Chofer (incluye COMPLETADO para que nunca desaparezcan de su semana)
     public List<TareaResponseDTO> obtenerTareasActivasChofer(Long choferId) {
         // Un chofer solo puede ver sus propias tareas
         validarAccesoAChofer(choferId);
@@ -94,7 +93,8 @@ public class TareaService {
                         choferId,
                         List.of(
                                 EstadoTarea.PENDIENTE,
-                                EstadoTarea.EN_CURSO
+                                EstadoTarea.EN_CURSO,
+                                EstadoTarea.COMPLETADO
                         )
                 )
                 .stream()
@@ -127,12 +127,12 @@ public class TareaService {
         // Un chofer solo puede ver su propia ruta
         validarAccesoAChofer(choferId);
 
-        // Busca la tarea PENDIENTE o EN_CURSO del chofer
+        // Busca la tarea PENDIENTE, EN_CURSO o COMPLETADO del chofer
         Tarea tarea = tareaRepository
                 .findByUsuarioIdAndEstadoIn(choferId,
-                        List.of(EstadoTarea.PENDIENTE, EstadoTarea.EN_CURSO))
+                        List.of(EstadoTarea.PENDIENTE, EstadoTarea.EN_CURSO, EstadoTarea.COMPLETADO))
                 .orElseThrow(() -> new TareaNoEncontradaException(
-                        "No hay tareas activas para el chofer con ID: " + choferId));
+                        "No hay tareas para el chofer con ID: " + choferId));
 
         Ruta ruta = tarea.getRuta();
 
@@ -163,6 +163,7 @@ public class TareaService {
                 .idUsuario(tarea.getUsuario().getId())
                 .build();
     }
+
     private ServicioResponseDTO servicioToDto(Servicio servicio) {
         return ServicioResponseDTO.builder()
                 .id(servicio.getId())
