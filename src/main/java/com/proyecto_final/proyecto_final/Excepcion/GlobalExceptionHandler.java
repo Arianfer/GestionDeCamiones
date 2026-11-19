@@ -3,6 +3,7 @@ package com.proyecto_final.proyecto_final.Excepcion;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -21,6 +22,13 @@ public class GlobalExceptionHandler {
     }
 
     // URL que no existe en la API
+    // 403: el usuario está logueado pero no tiene permiso sobre ese dato (SCRUM-138).
+    // Sin este handler Spring responde 403 sin cuerpo y el front no puede mostrar el motivo.
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> manejarAccesoDenegado(AccessDeniedException ex) {
+        return construirRespuesta(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, Object>> manejarUrlInexistente(NoResourceFoundException ex) {
         return construirRespuesta(HttpStatus.NOT_FOUND, ex.getMessage());

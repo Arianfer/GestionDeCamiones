@@ -15,7 +15,10 @@ import com.proyecto_final.proyecto_final.Excepcion.CamionNoDisponibleException;
 import com.proyecto_final.proyecto_final.Excepcion.RutaNoHalladaException;
 import com.proyecto_final.proyecto_final.Excepcion.TareaNoEncontradaException;
 import com.proyecto_final.proyecto_final.Excepcion.UsuarioDesactivadoException;
+import com.proyecto_final.proyecto_final.Enums.Rol;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
@@ -83,6 +86,8 @@ public class TareaService {
 
     //Tareas Activas por Chofer
     public List<TareaResponseDTO> obtenerTareasActivasChofer(Long choferId) {
+        // Un chofer solo puede ver sus propias tareas
+        validarAccesoAChofer(choferId);
 
         return tareaRepository
                 .findAllByUsuarioIdAndEstadoIn(
@@ -102,6 +107,9 @@ public class TareaService {
         Tarea tarea = tareaRepository.findById(id)
                 .orElseThrow(() -> new TareaNoEncontradaException("Tarea no encontrada"));
 
+        // Un chofer solo puede cambiar el estado de SUS tareas
+        validarAccesoAChofer(tarea.getUsuario().getId());
+
         tarea.setEstado(nuevoEstado);
 
         // Si se completa o cancela, liberar el camión
@@ -116,6 +124,8 @@ public class TareaService {
 
     // ── Endpoint estrella: ruta del chofer ────────────────────────────────────
     public RutaResponseDTO obtenerRutaDeChofer(Long choferId) {
+        // Un chofer solo puede ver su propia ruta
+        validarAccesoAChofer(choferId);
 
         // Busca la tarea PENDIENTE o EN_CURSO del chofer
         Tarea tarea = tareaRepository
@@ -167,5 +177,15 @@ public class TareaService {
                 .idRuta(servicio.getRuta().getIdRuta())
                 .idCliente(servicio.getCliente().getId())
                 .build();
+    }
+
+    // SCRUM-138: un EMPLEADO (chofer) solo puede acceder a sus propias tareas.
+    // ADMIN y OFICINA pueden acceder a las de cualquier chofer.
+    private void validarAccesoAChofer(Long choferId) {
+        Usuario usuarioActual = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (usuarioActual.getRol() == Rol.EMPLEADO && !usuarioActual.getId().equals(choferId)) {
+            throw new AccessDeniedException("No tenés permiso para acceder a las tareas de otro chofer.");
+        }
     }
 }

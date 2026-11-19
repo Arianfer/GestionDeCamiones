@@ -49,10 +49,31 @@ public class SecurityConfig {
                                         "/webjars/**"
                                 ).permitAll()
 
-                                // Aca solo jefes pueden gestionar/crear usuarios
-                                .requestMatchers("/api/usuarios/**").hasAnyRole("ADMIN", "OFICINA")
+                                // SCRUM-138: permisos por rol.
+                                // Spring aplica la PRIMERA regla que coincide, por eso lo que usa el chofer
+                                // va antes que la regla general de gestión.
 
-                                // Y por ultimo lo demas (clientes, camiones, recorridos) requiere estar logueado
+                                // Vista del chofer: sus tareas, su ruta y el cambio de estado de su tarea.
+                                // Que un chofer solo vea y cambie LO SUYO se controla en TareaService.
+                                .requestMatchers(HttpMethod.GET, "/api/tareas/mis-tareas/**", "/api/tareas/mi-ruta/**")
+                                    .hasAnyRole("ADMIN", "OFICINA", "EMPLEADO")
+                                .requestMatchers(HttpMethod.PATCH, "/api/tareas/*/estado")
+                                    .hasAnyRole("ADMIN", "OFICINA", "EMPLEADO")
+                                // La vista del chofer también consulta rutas y camiones (solo lectura)
+                                .requestMatchers(HttpMethod.GET, "/api/rutas/**", "/api/camiones/**")
+                                    .hasAnyRole("ADMIN", "OFICINA", "EMPLEADO")
+
+                                // Gestión: todo lo demás de estos módulos es solo para ADMIN y OFICINA
+                                .requestMatchers(
+                                        "/api/usuarios/**",
+                                        "/api/camiones/**",
+                                        "/api/clientes/**",
+                                        "/api/rutas/**",
+                                        "/api/servicios/**",
+                                        "/api/tareas/**"
+                                ).hasAnyRole("ADMIN", "OFICINA")
+
+                                // Cualquier otra ruta requiere estar logueado
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->

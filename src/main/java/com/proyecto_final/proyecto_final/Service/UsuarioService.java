@@ -106,7 +106,9 @@ public class UsuarioService {
     public Usuario actualizarUsuario(int id, UsuarioRequestDTO dto) {
         Usuario usuarioExistente = buscarPorId(id);
 
-        // OFICINA no puede convertir a un usuario en ADMIN (misma regla que al crear)
+        // OFICINA solo puede editar usuarios EMPLEADO...
+        validarGestionSobreUsuario(usuarioExistente);
+        // ...y no puede cambiarles el rol a otro que no sea EMPLEADO (misma regla que al crear)
         validarCreacionPorRol(dto.getRol());
         // Validar email duplicado en OTRO usuario (el propio puede conservar su email)
         if (usuarioRepository.existsByEmailAndIdNot(dto.getEmail(), usuarioExistente.getId())) {
@@ -134,6 +136,8 @@ public class UsuarioService {
     // Desactivar usuario (baja lógica, no elimina de la base de datos)
     public void desactivarUsuario(int id) {
         Usuario usuario = buscarPorId(id);
+        // OFICINA solo puede desactivar usuarios EMPLEADO
+        validarGestionSobreUsuario(usuario);
         usuario.setActivo(false);
         usuarioRepository.save(usuario);
     }
@@ -162,14 +166,26 @@ public class UsuarioService {
         }
     }
 
-    // Validar que OFICINA no pueda crear usuarios ADMIN
+    // SCRUM-138: OFICINA solo puede crear (o asignar el rol de) usuarios EMPLEADO
     private void validarCreacionPorRol(Rol rolNuevoUsuario) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String rolActual = auth.getAuthorities().iterator().next().getAuthority();
 
-        if (rolActual.equals("ROLE_OFICINA") && rolNuevoUsuario == Rol.ADMIN) {
+        if (rolActual.equals("ROLE_OFICINA") && rolNuevoUsuario != Rol.EMPLEADO) {
             throw new org.springframework.security.access.AccessDeniedException(
-                    "No tenés permisos para crear usuarios ADMIN.");
+                    "Desde OFICINA solo se pueden crear o asignar usuarios EMPLEADO.");
+        }
+    }
+
+    // SCRUM-138: OFICINA solo puede editar o desactivar usuarios EMPLEADO
+    // (sí puede VER a todos, salvo a los ADMIN: eso lo controla validarPermisoSobreUsuario)
+    private void validarGestionSobreUsuario(Usuario usuarioObjetivo) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String rolActual = auth.getAuthorities().iterator().next().getAuthority();
+
+        if (rolActual.equals("ROLE_OFICINA") && usuarioObjetivo.getRol() != Rol.EMPLEADO) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Desde OFICINA solo se pueden administrar usuarios EMPLEADO.");
         }
     }
 }
