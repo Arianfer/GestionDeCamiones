@@ -51,8 +51,13 @@ public class ClienteService {
     public ClienteResponseDTO actualizarCliente(Long id, ClienteRequestDTO datosNuevos) {
         Cliente clienteExistente = buscarPorId(id);
 
-        // Ojo: Si van a editar el CUIT o Razón Social, habría que validar que no choquen
-        // con otros, pero si solo editan datos menores o asumimos que el CUIT no cambia:
+        if (clienteRepository.existsByCuitAndIdNot(datosNuevos.getCuit(), clienteExistente.getId())) {
+            throw new RecursoDuplicadoException("Ya existe un cliente registrado con el CUIT: " + datosNuevos.getCuit());
+        }
+        if (clienteRepository.existsByRazonSocialAndIdNot(datosNuevos.getRazonSocial(), clienteExistente.getId())) {
+            throw new RecursoDuplicadoException("Ya existe un cliente registrado con la Razón Social: " + datosNuevos.getRazonSocial());
+        }
+
         clienteExistente.setRazonSocial(datosNuevos.getRazonSocial());
         clienteExistente.setCuit(datosNuevos.getCuit());
 
