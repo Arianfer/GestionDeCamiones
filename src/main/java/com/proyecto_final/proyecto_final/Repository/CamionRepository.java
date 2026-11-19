@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface CamionRepository extends JpaRepository<Camion, Long> {
 
     Optional<Camion> findByPatente(String patente);
+
+    // SCRUM-140: para validar la patente al editar ("¿hay OTRO camión con esta patente?")
+    boolean existsByPatenteAndIdNot(String patente, Long id);
 }
-
-
