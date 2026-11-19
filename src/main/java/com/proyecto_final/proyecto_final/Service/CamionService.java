@@ -60,7 +60,10 @@ public class CamionService {
         camionExistente.setPatente(datosNuevos.getPatente());
         camionExistente.setTipo(datosNuevos.getTipo());
         camionExistente.setEstadoCamion(datosNuevos.getEstadoCamion());
-        camionExistente.setCapacidadCarga(datosNuevos.getCapacidadCarga());
+        // SCRUM-151: si no vienen capacidad o consumo, se conserva lo que tenía el camión
+        if (datosNuevos.getCapacidadCarga() != null) {
+            camionExistente.setCapacidadCarga(datosNuevos.getCapacidadCarga());
+        }
         // SCRUM-140: antes el consumo nunca se guardaba. Si no viene, se conserva el que tenía.
         if (datosNuevos.getConsumoDieselPorKm() != null) {
             camionExistente.setConsumoDieselPorKm(datosNuevos.getConsumoDieselPorKm());
@@ -107,12 +110,20 @@ public class CamionService {
                 .build();
     }
     private Camion mapearToEntidad(CamionRequestDTO dto) {
+        // SCRUM-151: si no vienen capacidad o consumo, se usan los valores por defecto del tipo
+        Double capacidad = dto.getCapacidadCarga() != null
+                ? dto.getCapacidadCarga()
+                : dto.getTipo().getCapacidadPorDefecto();
+        Double consumo = dto.getConsumoDieselPorKm() != null
+                ? dto.getConsumoDieselPorKm()
+                : dto.getTipo().getConsumoPorDefecto();
+
         return Camion.builder()
                 .patente(dto.getPatente())
                 .tipo(dto.getTipo())
                 .estadoCamion(dto.getEstadoCamion())
-                .capacidadCarga(dto.getCapacidadCarga())
-                .consumoDieselPorKm(dto.getConsumoDieselPorKm()) // SCRUM-140: antes se perdía
+                .capacidadCarga(capacidad)
+                .consumoDieselPorKm(consumo) // SCRUM-140: antes se perdía
                 .build();
     }
 }

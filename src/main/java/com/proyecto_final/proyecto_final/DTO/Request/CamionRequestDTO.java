@@ -31,7 +31,7 @@ public class CamionRequestDTO {
     @NotNull(message = "Debe especificar un estado")
     private EstadoCamion estadoCamion;
 
-    @NotNull(message = "La capacidad de carga es obligatoria")
+    // SCRUM-151: ahora es opcional. Si no viene, se usa la capacidad por defecto del tipo.
     @Positive(message = "La capacidad de carga debe ser mayor a 0")
     private Double capacidadCarga;
 
