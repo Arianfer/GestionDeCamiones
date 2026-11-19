@@ -19,8 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import com.proyecto_final.proyecto_final.Excepcion.RecursoNoEncontradoException;
 
 @Service
@@ -127,10 +129,13 @@ public class TareaService {
         // Un chofer solo puede ver su propia ruta
         validarAccesoAChofer(choferId);
 
-        // Busca la tarea PENDIENTE, EN_CURSO o COMPLETADO del chofer
-        Tarea tarea = tareaRepository
-                .findByUsuarioIdAndEstadoIn(choferId,
-                        List.of(EstadoTarea.PENDIENTE, EstadoTarea.EN_CURSO, EstadoTarea.COMPLETADO))
+        // SCRUM-139: el chofer puede tener varias tareas (toda la semana).
+        // Antes se pedía una sola y, si había más de una, el endpoint daba 500.
+        List<Tarea> tareas = tareaRepository.findAllByUsuarioIdAndEstadoIn(
+                choferId,
+                List.of(EstadoTarea.PENDIENTE, EstadoTarea.EN_CURSO, EstadoTarea.COMPLETADO));
+
+        Tarea tarea = elegirTareaParaMostrar(tareas)
                 .orElseThrow(() -> new TareaNoEncontradaException(
                         "No hay tareas para el chofer con ID: " + choferId));
 
@@ -149,6 +154,34 @@ public class TareaService {
                 .descripcion(ruta.getDescripcion())
                 .servicios(serviciosOrdenados)
                 .build();
+    }
+
+    // SCRUM-139: de todas las tareas del chofer, elige cuál mostrar en mi-ruta.
+    // 1) La que está EN_CURSO (si arrancó un recorrido, ese es el que importa).
+    // 2) Si no, la de hoy o la próxima (la de fecha más cercana desde hoy en adelante).
+    // 3) Si todas son de días anteriores, la más reciente.
+    private Optional<Tarea> elegirTareaParaMostrar(List<Tarea> tareas) {
+        List<Tarea> conFecha = tareas.stream()
+                .filter(t -> t.getFechaEjecucion() != null)
+                .toList();
+
+        Optional<Tarea> enCurso = conFecha.stream()
+                .filter(t -> t.getEstado() == EstadoTarea.EN_CURSO)
+                .min(Comparator.comparing(Tarea::getFechaEjecucion));
+        if (enCurso.isPresent()) {
+            return enCurso;
+        }
+
+        LocalDate hoy = LocalDate.now();
+        Optional<Tarea> deHoyEnAdelante = conFecha.stream()
+                .filter(t -> !t.getFechaEjecucion().toLocalDate().isBefore(hoy))
+                .min(Comparator.comparing(Tarea::getFechaEjecucion));
+        if (deHoyEnAdelante.isPresent()) {
+            return deHoyEnAdelante;
+        }
+
+        return conFecha.stream()
+                .max(Comparator.comparing(Tarea::getFechaEjecucion));
     }
 
     // Mapeos a dto
