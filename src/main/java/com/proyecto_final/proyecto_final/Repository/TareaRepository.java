@@ -6,13 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface TareaRepository extends JpaRepository<Tarea, Long> {
-    // Para buscar la tarea que tiene asignada el chofer actualmente
-    Optional<Tarea> findByUsuarioIdAndEstadoIn(Long usuarioId, List<EstadoTarea> estados);
-
+    // Todas las tareas de un chofer en los estados indicados.
+    // SCRUM-139: se usa también para mi-ruta; la tarea a mostrar se elige en TareaService.
     List<Tarea> findAllByUsuarioIdAndEstadoIn(
             Long usuarioId,
             List<EstadoTarea> estados
