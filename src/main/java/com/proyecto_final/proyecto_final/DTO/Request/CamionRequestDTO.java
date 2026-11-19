@@ -34,4 +34,9 @@ public class CamionRequestDTO {
     @NotNull(message = "La capacidad de carga es obligatoria")
     @Positive(message = "La capacidad de carga debe ser mayor a 0")
     private Double capacidadCarga;
+
+    // SCRUM-140: antes no estaba y Jackson descartaba el valor que manda el front.
+    // Es opcional (puede venir null), pero si viene tiene que ser mayor a 0.
+    @Positive(message = "El consumo de diésel por km debe ser mayor a 0")
+    private Double consumoDieselPorKm;
 }

@@ -31,6 +31,12 @@ public class CamionController {
         return camionService.buscarPorId(id);
     }
 
+    // SCRUM-140: el front ya llamaba a este endpoint pero no existía (respondía 405)
+    @PutMapping("/{id}")
+    public CamionResponseDTO actualizar(@PathVariable Long id, @Valid @RequestBody CamionRequestDTO camiondto) {
+        return camionService.actualizarCamion(id, camiondto);
+    }
+
     @GetMapping("/{id}/costo-combustible")
     public Double calcularCostoCombustible(@PathVariable Long id, @RequestParam Double km) {
         return camionService.calcularCostoViaje(id, km);

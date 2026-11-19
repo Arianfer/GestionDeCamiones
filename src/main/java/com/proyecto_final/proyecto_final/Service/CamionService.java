@@ -52,10 +52,19 @@ public class CamionService {
     public CamionResponseDTO actualizarCamion(Long id, CamionRequestDTO datosNuevos) {
         Camion camionExistente = buscarPorId(id);
 
+        // SCRUM-140: la patente no puede ser la de OTRO camión (el propio puede conservarla)
+        if (camionRepository.existsByPatenteAndIdNot(datosNuevos.getPatente(), id)) {
+            throw new RecursoDuplicadoException("Ya existe un camión registrado con la patente: " + datosNuevos.getPatente());
+        }
+
         camionExistente.setPatente(datosNuevos.getPatente());
         camionExistente.setTipo(datosNuevos.getTipo());
         camionExistente.setEstadoCamion(datosNuevos.getEstadoCamion());
         camionExistente.setCapacidadCarga(datosNuevos.getCapacidadCarga());
+        // SCRUM-140: antes el consumo nunca se guardaba. Si no viene, se conserva el que tenía.
+        if (datosNuevos.getConsumoDieselPorKm() != null) {
+            camionExistente.setConsumoDieselPorKm(datosNuevos.getConsumoDieselPorKm());
+        }
 
         return mapearToDto(camionRepository.save(camionExistente));
     }
@@ -103,6 +112,7 @@ public class CamionService {
                 .tipo(dto.getTipo())
                 .estadoCamion(dto.getEstadoCamion())
                 .capacidadCarga(dto.getCapacidadCarga())
+                .consumoDieselPorKm(dto.getConsumoDieselPorKm()) // SCRUM-140: antes se perdía
                 .build();
     }
 }
